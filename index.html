@@ -80,6 +80,8 @@
     .summary-copy strong { font-size: 13px; }
     .summary-copy small { color: var(--muted); font-size: 10px; }
     .shop-details { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 17px; margin: -14px 0 29px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    .shopkeeper-actions { display: flex; align-items: center; justify-content: end; gap: 10px; }
+    .shopkeeper-shop-select { min-height: 40px; max-width: 240px; padding: 0 11px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font-size: 11px; }
     .shop-detail { display: flex; align-items: center; gap: 10px; }
     .shop-detail .summary-icon { width: 34px; height: 34px; font-size: 15px; }
     .shop-detail strong { display: block; margin-bottom: 3px; font-size: 10px; }
@@ -391,7 +393,7 @@
       </section>
     </section>
     <section class="screen" id="shopkeeperScreen">
-      <div class="welcome-row"><div><p class="eyebrow">Shopkeeper workspace</p><h1>Shop overview</h1><p class="welcome-copy">Managing <strong id="managedShopName">Community Ration Shop</strong> · Manage its stock, orders, and transactions.</p></div><button class="button light" id="shopInfoButton">✎ &nbsp; Shop information</button></div>
+      <div class="welcome-row"><div><p class="eyebrow">Shopkeeper workspace</p><h1>Shop overview</h1><p class="welcome-copy">Managing <strong id="managedShopName">Community Ration Shop</strong> · Manage its stock, orders, and transactions.</p></div><div class="shopkeeper-actions"><select class="shopkeeper-shop-select" id="shopkeeperShopSelect" aria-label="Choose shop to view"></select><button class="button light" id="shopInfoButton">✎ &nbsp; Shop information</button></div></div>
       <div class="metrics"><div class="metric"><small>Today’s transactions</small><strong id="metricTransactions">0</strong><span>Across all payment types</span></div><div class="metric"><small>Online payments</small><strong id="metricOnline">₹0</strong><span>PayTM orders</span></div><div class="metric"><small>Cash on delivery</small><strong id="metricCash">₹0</strong><span>Collected on delivery</span></div></div>
       <div class="dashboard-grid">
         <section class="panel"><div class="panel-heading"><h2>Inventory</h2><button class="button light" id="saveStockButton">Save changes</button></div><div class="panel-body"><p class="welcome-copy" style="margin-bottom:16px">Update available stock. Changes appear in the customer shop.</p><div class="inventory-list" id="inventoryList"></div></div></section>
@@ -434,6 +436,7 @@
     let currentRole = "customer";
     let rationCardValid = false;
     let selectedShopId = "market-road";
+    let shopkeeperShopId = "market-road";
     let nextOrder = 2408;
     let nextComplaint = 1;
     const selectedShop = () => shops.find(shop => shop.id === selectedShopId);
@@ -671,11 +674,17 @@
       tbody.innerHTML = orders.length ? orders.map(order => `<tr><td><strong>${order.id}</strong></td><td>${escapeHTML(order.shopName)}</td><td>${order.date}</td><td>${order.items.reduce((sum, item) => sum + item.count, 0)} packs · ${order.weight} kg</td><td>${order.payment}</td><td><strong>${money(order.amount)}</strong></td><td><span class="status ${order.status === "Rejected" ? "rejected" : order.status === "Processing" ? "pending" : ""}">${order.status}</span></td></tr>`).join("") : `<tr><td colspan="7" class="empty-orders">No orders yet. Your next essentials order will appear here.</td></tr>`;
     }
     function renderShopkeeper() {
-      const shop = selectedShop();
+      const shop = shopById(shopkeeperShopId);
       const shopOrders = orders.filter(order => order.shopId === shop.id);
       const shopComplaints = complaints.filter(complaint => complaint.shopId === shop.id);
       document.getElementById("managedShopName").textContent = shop.name;
-      document.getElementById("inventoryList").innerHTML = shopProducts().map(item => `<div class="inventory-item"><span class="mini">${productIcon(item)}</span><span><strong>${item.name}</strong><small>${money(item.price)} per ${item.pack}</small></span><label><span class="form-hint">Stock (packs)</span><input class="stock-input" type="number" min="0" data-stock="${item.id}" value="${item.stock}" aria-label="${item.name} stock in packs"></label></div>`).join("");
+      const shopSelect = document.getElementById("shopkeeperShopSelect");
+      shopSelect.innerHTML = shops.map(item => `<option value="${escapeHTML(item.id)}">${escapeHTML(item.name)}</option>`).join("");
+      shopSelect.value = shop.id;
+      document.getElementById("inventoryList").innerHTML = products.map(item => {
+        const shopItem = product(item.id, shop.id);
+        return `<div class="inventory-item"><span class="mini">${productIcon(shopItem)}</span><span><strong>${escapeHTML(shopItem.name)}</strong><small>${money(shopItem.price)} per ${escapeHTML(shopItem.pack)}</small></span><label><span class="form-hint">Stock (packs)</span><input class="stock-input" type="number" min="0" data-stock="${escapeHTML(shopItem.id)}" value="${shopItem.stock}" aria-label="${escapeHTML(shopItem.name)} stock in packs"></label></div>`;
+      }).join("");
       const ordersRows = shopOrders.length ? shopOrders.map(order => `<tr><td><strong>${order.id}</strong><br><span class="form-hint">Customer · ${order.weight} kg</span></td><td>${order.payment}</td><td><span class="status ${order.status === "Rejected" ? "rejected" : order.status === "Processing" ? "pending" : ""}">${order.status}</span></td><td>${order.status === "Processing" ? `<button class="table-action" data-reject="${order.id}">Reject</button>` : ""}</td></tr>`).join("") : `<tr><td colspan="4" class="empty-orders">New customer orders for ${escapeHTML(shop.name)} will appear here.</td></tr>`;
       document.getElementById("shopkeeperOrders").innerHTML = ordersRows;
       document.getElementById("transactions").innerHTML = shopOrders.length ? shopOrders.map(order => `<tr><td><strong>${order.id}</strong></td><td>${order.date}</td><td>${order.payment}</td><td><strong>${money(order.amount)}</strong></td><td><span class="status ${order.status === "Rejected" ? "rejected" : ""}">${order.status === "Rejected" ? "Refund / review" : order.payment === "PayTM" ? "Paid online" : "Due on delivery"}</span></td></tr>`).join("") : `<tr><td colspan="5" class="empty-orders">Transactions for this shop will appear here as orders are placed.</td></tr>`;
@@ -694,7 +703,7 @@
           const quantity = Number(input.value);
           if (Number.isInteger(quantity) && quantity >= 0) shop.stocks[input.dataset.stock] = quantity;
         });
-        renderProducts();
+        if (shop.id === selectedShopId) renderProducts();
         showToast("Inventory updated and visible in the customer shop.");
       };
     }
@@ -711,7 +720,7 @@
       showToast(`Order ${id} rejected. Customer email notification queued (prototype).`);
     }
     function reviewComplaint(id) {
-      const complaint = complaints.find(item => item.id === id && item.shopId === selectedShopId);
+      const complaint = complaints.find(item => item.id === id && item.shopId === shopkeeperShopId);
       if (!complaint) return;
       openModal(`<div class="modal-top"><div><p class="eyebrow">Customer support · ${escapeHTML(complaint.id)}</p><h2 id="modalTitle">Review complaint</h2><p>Order ${escapeHTML(complaint.order)} · Submitted ${escapeHTML(complaint.date)}</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
         <div class="order-confirm">${escapeHTML(complaint.details)}</div>
@@ -792,9 +801,14 @@
     document.getElementById("shopNowButton").addEventListener("click", () => document.getElementById("catalog").scrollIntoView({ behavior: "smooth" }));
     document.getElementById("complaintButton").addEventListener("click", submitComplaint);
     document.getElementById("complaintTabButton").addEventListener("click", submitComplaint);
+    document.getElementById("shopkeeperShopSelect").addEventListener("change", event => {
+      shopkeeperShopId = event.currentTarget.value;
+      renderShopkeeper();
+      showToast(`Now viewing ${shopById(shopkeeperShopId).name}.`);
+    });
     document.getElementById("shopInfoButton").addEventListener("click", () => {
       openModal(`<div class="modal-top"><div><p class="eyebrow">Shop profile</p><h2 id="modalTitle">Local shop information</h2><p>Keep customers up to date with your shop details.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div><form id="shopInfoForm"><div class="form-field"><label for="shopName">Shop name</label><input id="shopName" required></div><div class="form-field"><label for="shopAddress">Address</label><input id="shopAddress" required></div><div class="form-field"><label for="shopHours">Shop hours</label><input id="shopHours" required></div><button class="button full" type="submit">Save shop details</button></form>`);
-      const shop = selectedShop();
+      const shop = shopById(shopkeeperShopId);
       document.getElementById("shopName").value = shop.name;
       document.getElementById("shopAddress").value = shop.address;
       document.getElementById("shopHours").value = shop.hours;
@@ -804,7 +818,7 @@
     document.addEventListener("submit", event => {
       if (event.target.id === "shopInfoForm") {
         event.preventDefault();
-        const shop = selectedShop();
+        const shop = shopById(shopkeeperShopId);
         shop.name = document.getElementById("shopName").value;
         shop.address = document.getElementById("shopAddress").value;
         shop.hours = document.getElementById("shopHours").value;
