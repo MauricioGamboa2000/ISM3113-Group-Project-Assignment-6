@@ -1,1 +1,737 @@
+﻿
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f2">
+  <title>E-Ration Shop</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20251f;
+      --muted: #70766d;
+      --line: #e8e9e1;
+      --paper: #fff;
+      --canvas: #f7f7f2;
+      --green: #245b3b;
+      --green-dark: #19442b;
+      --green-soft: #eaf2e8;
+      --lime: #d9e9a4;
+      --orange: #c46739;
+      --shadow: 0 14px 36px rgba(28, 39, 27, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #8bb785;
+      outline-offset: 2px;
+    }
+    .topbar {
+      position: sticky; top: 0; z-index: 5; height: 72px; padding: 0 max(28px, calc((100vw - 1320px) / 2));
+      display: flex; align-items: center; gap: 32px; background: rgba(255,255,255,.94); border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 800; font-size: 20px; letter-spacing: -.7px; text-decoration: none; }
+    .brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; color: #fff; background: var(--green); font-size: 19px; }
+    .brand em { color: var(--green); font-style: normal; }
+    .main-nav { display: flex; align-items: center; gap: 25px; margin-left: 18px; }
+    .nav-link { padding: 9px 0; border: 0; background: none; color: var(--muted); font-size: 13px; font-weight: 650; }
+    .nav-link.active { color: var(--green); }
+    .nav-link:hover { color: var(--green-dark); }
+    .top-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+    .icon-btn { position: relative; width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: var(--ink); font-size: 17px; }
+    .cart-count { position: absolute; top: -4px; right: -4px; display: grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 99px; color: #fff; background: var(--green); font-size: 10px; font-weight: 800; }
+    .profile-btn { display: flex; align-items: center; gap: 9px; border: 0; background: transparent; color: var(--ink); text-align: left; }
+    .avatar { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: var(--green); background: var(--green-soft); font-size: 12px; font-weight: 800; }
+    .profile-copy { display: grid; gap: 2px; font-size: 12px; font-weight: 700; }
+    .profile-copy small { color: var(--muted); font-size: 10px; font-weight: 500; }
+    main { max-width: 1320px; margin: 0 auto; padding: 32px 28px 72px; }
+    .welcome-row { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 25px; }
+    .eyebrow { margin: 0 0 8px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 7px; font-size: clamp(26px, 3vw, 35px); line-height: 1.12; letter-spacing: -1.2px; }
+    .welcome-copy { margin: 0; color: var(--muted); font-size: 13px; }
+    .verified-pill { display: inline-flex; align-items: center; gap: 7px; padding: 9px 12px; border: 1px solid #d8e6d4; border-radius: 99px; color: var(--green); background: #f3f8f1; font-size: 11px; font-weight: 750; white-space: nowrap; }
+    .verified-pill span { font-size: 14px; }
+    .hero {
+      position: relative; overflow: hidden; min-height: 218px; padding: 34px 38px; display: flex; align-items: center;
+      border-radius: 20px; color: #fff; background: #235238;
+    }
+    .hero::before, .hero::after { content: ""; position: absolute; border: 1px solid rgba(255,255,255,.09); border-radius: 50%; }
+    .hero::before { width: 360px; height: 360px; right: 4%; top: -155px; }
+    .hero::after { width: 260px; height: 260px; right: 8%; top: -104px; }
+    .hero-copy { position: relative; z-index: 1; max-width: 480px; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 14px; padding: 6px 10px; border: 1px solid rgba(255,255,255,.2); border-radius: 99px; color: #e6f0d0; font-size: 10px; font-weight: 750; letter-spacing: .6px; text-transform: uppercase; }
+    .hero h2 { margin-bottom: 8px; font-size: clamp(25px, 3vw, 35px); letter-spacing: -1px; }
+    .hero p { margin-bottom: 19px; color: #d5e2d5; font-size: 13px; line-height: 1.6; }
+    .hero .button { border-color: var(--lime); color: var(--green-dark); background: var(--lime); }
+    .hero-art { position: absolute; right: 10%; bottom: -2px; display: flex; align-items: end; gap: 12px; height: 185px; opacity: .98; }
+    .grain-bag { position: relative; width: 92px; height: 122px; display: grid; place-items: center; border-radius: 24px 24px 14px 14px; color: #5a4226; background: #e8c98f; transform: rotate(-5deg); font-size: 36px; box-shadow: inset 0 -14px rgba(149,100,48,.12); }
+    .grain-bag.two { width: 76px; height: 101px; color: #536a35; background: #c9d69b; transform: rotate(7deg); font-size: 31px; }
+    .hero-sun { position: absolute; right: 19%; top: 39px; width: 45px; height: 45px; border-radius: 50%; background: var(--lime); opacity: .95; }
+    .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0 30px; }
+    .summary-card { display: flex; align-items: center; gap: 12px; padding: 15px 17px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    .summary-icon { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 auto; border-radius: 12px; background: var(--green-soft); font-size: 17px; }
+    .summary-copy { display: grid; gap: 3px; }
+    .summary-copy strong { font-size: 13px; }
+    .summary-copy small { color: var(--muted); font-size: 10px; }
+    .shop-details { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 17px; margin: -14px 0 29px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    .shop-detail { display: flex; align-items: center; gap: 10px; }
+    .shop-detail .summary-icon { width: 34px; height: 34px; font-size: 15px; }
+    .shop-detail strong { display: block; margin-bottom: 3px; font-size: 10px; }
+    .shop-detail small { color: var(--muted); font-size: 9px; }
+    .shop-picker { margin: 0 0 25px; }
+    .shop-picker-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .shop-picker-heading h2 { margin: 0 0 4px; font-size: 17px; letter-spacing: -.4px; }
+    .shop-picker-heading p { margin: 0; color: var(--muted); font-size: 10px; }
+    .shop-picker-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
+    .shop-choice { position: relative; display: grid; grid-template-columns: 34px 1fr; align-items: start; gap: 10px; padding: 13px; border: 1px solid var(--line); border-radius: 13px; background: #fff; text-align: left; transition: border-color .15s ease, box-shadow .15s ease; }
+    .shop-choice:hover { border-color: #b8cdb1; }
+    .shop-choice.active { border-color: var(--green); box-shadow: 0 0 0 2px rgba(36,91,59,.08); }
+    .shop-choice-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; color: var(--green); background: var(--green-soft); font-size: 16px; }
+    .shop-choice-copy strong { display: block; padding-right: 52px; margin: 1px 0 4px; color: var(--ink); font-size: 10px; line-height: 1.35; }
+    .shop-choice-copy small { display: block; margin-bottom: 6px; color: var(--muted); font-size: 9px; }
+    .shop-choice-copy .shop-distance { margin: 0; color: var(--green); font-weight: 700; }
+    .shop-choice-status { position: absolute; top: 13px; right: 10px; padding: 4px 6px; border-radius: 99px; color: var(--green); background: var(--green-soft); font-size: 8px; font-weight: 750; }
+    .catalog-layout { display: grid; grid-template-columns: minmax(0, 1fr) 316px; align-items: start; gap: 23px; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+    .section-heading h2 { margin: 0 0 4px; font-size: 21px; letter-spacing: -.5px; }
+    .section-heading p { margin: 0; color: var(--muted); font-size: 11px; }
+    .search { width: min(230px, 38vw); padding: 10px 13px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font-size: 11px; }
+    .category-row { display: flex; gap: 8px; overflow: auto; margin: 0 0 18px; padding-bottom: 2px; }
+    .category { padding: 8px 13px; border: 1px solid var(--line); border-radius: 99px; color: #626960; background: #fff; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .category.active { border-color: var(--green); color: #fff; background: var(--green); }
+    .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+    .product-card { overflow: hidden; border: 1px solid var(--line); border-radius: 15px; background: #fff; transition: transform .18s ease, box-shadow .18s ease; }
+    .product-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .product-visual { position: relative; height: 130px; display: grid; place-items: center; overflow: hidden; background: #f1f1e8; }
+    .product-visual::before { content: ""; position: absolute; width: 130px; height: 130px; border-radius: 50%; background: rgba(255,255,255,.5); }
+    .product-visual .emoji { position: relative; z-index: 1; display: grid; place-items: center; font-size: 54px; filter: drop-shadow(0 8px 8px rgba(36,44,30,.12)); }
+    .product-visual .emoji svg { width: 70px; height: 70px; }
+    .product-visual.rice { background: #f1efe2; }
+    .product-visual.wheat { background: #f5ead6; }
+    .product-visual.dal { background: #f5e9d9; }
+    .product-visual.oil { background: #f6f0d9; }
+    .product-visual.sugar { background: #e9f0ed; }
+    .product-visual.salt { background: #e9edf1; }
+    .stock-badge { position: absolute; z-index: 1; top: 10px; left: 10px; padding: 5px 7px; border-radius: 99px; color: var(--green); background: rgba(255,255,255,.88); font-size: 9px; font-weight: 750; }
+    .product-info { padding: 13px; }
+    .product-info h3 { margin: 0 0 4px; font-size: 13px; }
+    .product-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; }
+    .product-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 13px; }
+    .price { color: var(--green-dark); font-size: 15px; font-weight: 850; }
+    .price small { color: var(--muted); font-size: 9px; font-weight: 550; }
+    .add-btn { width: 31px; height: 31px; border: 1px solid #dfe8dc; border-radius: 9px; color: var(--green); background: var(--green-soft); font-size: 19px; line-height: 1; }
+    .add-btn:hover { color: white; background: var(--green); }
+    .qty-control { display: flex; align-items: center; gap: 8px; }
+    .qty-control button { width: 25px; height: 25px; border: 1px solid var(--line); border-radius: 7px; color: var(--green); background: #fff; font-weight: 750; }
+    .qty-control span { min-width: 12px; text-align: center; font-size: 11px; font-weight: 750; }
+    .cart-panel { position: sticky; top: 92px; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 17px; border-bottom: 1px solid var(--line); }
+    .cart-header h2 { margin: 0; font-size: 15px; }
+    .cart-header span { padding: 5px 8px; border-radius: 99px; color: var(--green); background: var(--green-soft); font-size: 9px; font-weight: 750; }
+    .cart-items { display: grid; gap: 12px; max-height: 230px; overflow: auto; padding: 15px 17px; }
+    .cart-empty { padding: 13px 0 18px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .cart-line { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 8px; }
+    .cart-line .mini { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 9px; background: var(--canvas); font-size: 17px; }
+    .cart-line .mini svg, .inventory-item .mini svg { width: 23px; height: 23px; }
+    .cart-line strong { display: block; font-size: 10px; }
+    .cart-line small { color: var(--muted); font-size: 9px; }
+    .cart-line b { font-size: 10px; }
+    .cart-details { padding: 0 17px 17px; }
+    .limit-box { padding: 12px; border-radius: 11px; background: #f7f8f3; }
+    .limit-top { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 10px; }
+    .limit-top span { color: var(--muted); }
+    .progress-track { height: 6px; overflow: hidden; border-radius: 99px; background: #e3e7dd; }
+    .progress-fill { width: 0; height: 100%; border-radius: inherit; background: #78a76f; transition: width .2s ease; }
+    .limit-note { margin: 7px 0 0; color: var(--muted); font-size: 9px; }
+    .total-row { display: flex; justify-content: space-between; margin: 15px 0; font-size: 11px; }
+    .total-row strong { font-size: 16px; }
+    .button { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 40px; padding: 0 15px; border: 1px solid var(--green); border-radius: 10px; color: #fff; background: var(--green); font-size: 11px; font-weight: 750; transition: background .15s ease, transform .15s ease; }
+    .button:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .button:disabled { cursor: not-allowed; opacity: .45; transform: none; }
+    .button.full { width: 100%; }
+    .button.secondary { border-color: var(--line); color: var(--ink); background: #fff; }
+    .button.secondary:hover { background: var(--canvas); }
+    .button.light { border-color: #dce7d7; color: var(--green); background: #f5f8f2; }
+    .safe-note { margin: 11px 0 0; color: var(--muted); font-size: 9px; text-align: center; }
+    .footer { display: flex; justify-content: space-between; gap: 15px; margin-top: 45px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    .footer strong { color: var(--green); }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .panel { border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 18px; border-bottom: 1px solid var(--line); }
+    .panel-heading h2 { margin: 0; font-size: 14px; }
+    .panel-body { padding: 17px 18px; }
+    .complaint-intro { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 19px; }
+    .complaint-intro h2 { margin: 0 0 5px; font-size: 15px; }
+    .complaint-intro p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .complaint-list { display: grid; gap: 10px; padding: 16px 19px; }
+    .complaint-card { display: grid; grid-template-columns: minmax(110px, .7fr) 1fr auto; align-items: center; gap: 12px; padding: 13px; border: 1px solid var(--line); border-radius: 11px; }
+    .complaint-card strong { display: block; margin-bottom: 4px; font-size: 10px; }
+    .complaint-card small { color: var(--muted); font-size: 9px; line-height: 1.5; }
+    .complaint-details { overflow-wrap: anywhere; }
+    .inventory-list { display: grid; gap: 12px; }
+    .inventory-item { display: grid; grid-template-columns: 35px 1fr 90px; gap: 10px; align-items: center; }
+    .inventory-item .mini { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 9px; background: var(--canvas); font-size: 17px; }
+    .inventory-item strong { display: block; font-size: 11px; }
+    .inventory-item small { color: var(--muted); font-size: 9px; }
+    .stock-input { width: 90px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; font-size: 10px; }
+    .table-wrap { overflow: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 10px; color: var(--muted); font-size: 9px; font-weight: 700; }
+    td { padding: 12px 10px; border-top: 1px solid #f0f0eb; font-size: 10px; }
+    td strong { font-size: 10px; }
+    .status { display: inline-block; padding: 5px 8px; border-radius: 99px; color: var(--green); background: var(--green-soft); font-size: 9px; font-weight: 750; white-space: nowrap; }
+    .status.pending { color: #8c5c19; background: #fbf0dc; }
+    .status.rejected { color: #9c3e37; background: #f9e9e7; }
+    .table-action { padding: 6px 8px; border: 1px solid var(--line); border-radius: 7px; color: #963f36; background: #fff; font-size: 9px; font-weight: 700; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 17px; }
+    .metric { padding: 16px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    .metric small { display: block; margin-bottom: 7px; color: var(--muted); font-size: 10px; }
+    .metric strong { font-size: 20px; letter-spacing: -.5px; }
+    .metric span { display: block; margin-top: 5px; color: var(--green); font-size: 9px; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 20; display: none; place-items: center; padding: 20px; background: rgba(22,31,23,.48); backdrop-filter: blur(4px); }
+    .modal-backdrop.open { display: grid; }
+    .login-splash { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; overflow-y: auto; padding: 24px; background: radial-gradient(circle at 78% 18%, rgba(217,233,164,.34), transparent 28%), var(--canvas); }
+    .login-splash[hidden] { display: none; }
+    .login-card { width: min(460px, 100%); padding: clamp(24px, 5vw, 42px); border: 1px solid var(--line); border-radius: 22px; background: #fff; box-shadow: 0 24px 70px rgba(28,39,27,.12); }
+    .login-brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 32px; font-size: 18px; font-weight: 850; letter-spacing: -.5px; }
+    .login-brand .brand-mark { width: 38px; height: 38px; }
+    .login-card h1 { margin-bottom: 10px; font-size: 30px; }
+    .login-copy { margin-bottom: 22px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .login-security { display: flex; gap: 10px; padding: 12px; margin: 16px 0 18px; border-radius: 11px; color: var(--green); background: #f3f8f1; font-size: 10px; line-height: 1.55; }
+    .login-security strong { display: block; margin-bottom: 2px; font-size: 10px; }
+    .login-feedback { min-height: 18px; margin: 9px 0 0; color: #a13f35; font-size: 10px; }
+    .login-demo-note { margin: 14px 0 0; color: var(--muted); font-size: 9px; line-height: 1.6; text-align: center; }
+    .modal { width: min(460px, 100%); max-height: min(90vh, 760px); overflow: auto; padding: 24px; border-radius: 19px; background: #fff; box-shadow: 0 24px 70px rgba(0,0,0,.18); }
+    .modal-top { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 18px; }
+    .modal-top h2 { margin: 0 0 5px; font-size: 20px; letter-spacing: -.5px; }
+    .modal-top p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .close-btn { width: 31px; height: 31px; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: var(--muted); font-size: 17px; }
+    .form-field { display: grid; gap: 6px; margin: 13px 0; }
+    .form-field label { font-size: 10px; font-weight: 750; }
+    .form-field input, .form-field select, .form-field textarea { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fff; font-size: 11px; }
+    .form-field textarea { min-height: 92px; resize: vertical; }
+    .form-hint { color: var(--muted); font-size: 9px; line-height: 1.5; }
+    .payment-option { display: flex; align-items: center; gap: 10px; padding: 12px; margin: 9px 0; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+    .payment-option:has(input:checked) { border-color: #9bb997; background: #f5f9f2; }
+    .payment-option input { accent-color: var(--green); }
+    .payment-option strong { display: block; font-size: 11px; }
+    .payment-option small { color: var(--muted); font-size: 9px; }
+    .order-confirm { padding: 12px; margin: 14px 0; border-radius: 10px; background: var(--canvas); font-size: 10px; line-height: 1.6; }
+    .toast { position: fixed; right: 22px; bottom: 22px; z-index: 30; max-width: min(360px, calc(100vw - 44px)); padding: 13px 16px; border-radius: 11px; color: #fff; background: #263b2c; box-shadow: var(--shadow); font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(12px); transition: all .2s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .empty-orders { padding: 18px 10px; color: var(--muted); text-align: center; font-size: 10px; }
+    @media (max-width: 950px) {
+      .topbar { gap: 15px; padding: 0 20px; }
+      .main-nav { gap: 15px; margin-left: 4px; }
+      .catalog-layout { grid-template-columns: minmax(0, 1fr) 285px; gap: 15px; }
+      .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-art { right: 6%; opacity: .7; }
+    }
+    @media (max-width: 700px) {
+      .topbar { height: 63px; padding: 0 15px; }
+      .main-nav { gap: 7px; }
+      .nav-link { padding: 8px 5px; font-size: 10px; }
+      .profile-copy { display: none; }
+      main { padding: 24px 15px 50px; }
+      .welcome-row { align-items: start; }
+      .verified-pill { padding: 7px 9px; font-size: 9px; }
+      .hero { min-height: 200px; padding: 25px; }
+      .hero-art { right: -6%; opacity: .34; }
+      .hero-sun { right: 16%; opacity: .45; }
+      .summary-grid { gap: 7px; }
+      .summary-card { align-items: start; gap: 7px; padding: 11px 8px; }
+      .summary-icon { width: 29px; height: 29px; font-size: 14px; }
+      .summary-copy strong { font-size: 10px; }
+      .summary-copy small { font-size: 8px; line-height: 1.4; }
+      .shop-details { align-items: start; flex-direction: column; gap: 12px; margin-top: -14px; }
+      .shop-picker-grid { grid-template-columns: 1fr; }
+      .shop-choice-copy strong { padding-right: 60px; }
+      .catalog-layout { grid-template-columns: 1fr; }
+      .cart-panel { position: static; }
+      .cart-items { max-height: 180px; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .metrics { gap: 7px; }
+      .metric { padding: 12px 9px; }
+      .metric small { font-size: 8px; }
+      .metric strong { font-size: 16px; }
+      .metric span { font-size: 8px; }
+    }
+    @media (max-width: 430px) {
+      .topbar { gap: 7px; }
+      .brand { gap: 5px; font-size: 12px; letter-spacing: -.5px; white-space: nowrap; }
+      .brand-mark { width: 31px; height: 31px; }
+      .main-nav { flex: 1; justify-content: center; gap: 0; min-width: 0; margin-left: 0; }
+      .nav-link { padding: 8px 3px; font-size: 8px; white-space: nowrap; }
+      .top-actions { gap: 7px; margin-left: 0; }
+      .icon-btn { width: 35px; height: 35px; }
+      .avatar { width: 33px; height: 33px; }
+      .search { width: 132px; }
+      .product-grid { gap: 9px; }
+      .product-visual { height: 108px; }
+      .product-info { padding: 10px; }
+      .product-info h3 { font-size: 11px; }
+      .price { font-size: 13px; }
+      .footer { flex-direction: column; }
+    }
+    @media (max-width: 370px) {
+      .main-nav { overflow-x: auto; justify-content: flex-start; }
+      .nav-link { padding-right: 5px; padding-left: 5px; }
+      .complaint-intro { align-items: start; flex-direction: column; }
+      .complaint-card { grid-template-columns: 1fr auto; }
+      .complaint-details { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+  <section class="login-splash" id="loginSplash" role="dialog" aria-modal="true" aria-labelledby="loginTitle" aria-describedby="loginDescription">
+    <div class="login-card">
+      <div class="login-brand"><span class="brand-mark">✳</span><span>E-Ration Shop</span></div>
+      <p class="eyebrow">Ration card eligibility</p>
+      <h1 id="loginTitle">Check your ration card</h1>
+      <p class="login-copy" id="loginDescription">Check that your ration card is valid before entering the shop. Aadhaar / OTP is used for the card status check only; it does not verify that you are the cardholder.</p>
+      <form id="loginForm">
+        <div class="form-field"><label for="loginAadhaar">Aadhaar number for status check</label><input id="loginAadhaar" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Enter 12-digit Aadhaar number" required pattern="[0-9]{12}"></div>
+        <div class="form-field"><label for="loginOtp">One-time password</label><input id="loginOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter one-time password" required pattern="[0-9]{6}"></div>
+        <div class="login-security"><span aria-hidden="true">✓</span><span><strong>Card status check only</strong>This checks ration card validity, not customer identity.</span></div>
+        <button class="button full" type="submit">Check card status &amp; continue →</button>
+        <p class="login-feedback" id="loginFeedback" role="alert" aria-live="polite"></p>
+      </form>
+      <p class="login-demo-note">Prototype demo: use any 12 digits and OTP 123456. No real Aadhaar details are transmitted or stored. This simulates a valid-card result.</p>
+    </div>
+  </section>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="E-Ration Shop home"><span class="brand-mark">✳</span><span>E-Ration Shop</span></a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <button class="nav-link active" data-screen="shop">Shop</button>
+      <button class="nav-link" data-screen="orders">My orders</button>
+      <button class="nav-link" data-screen="complaints">File Complaint/Help</button>
+      <button class="nav-link" data-screen="shopkeeper">Shopkeeper</button>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="cartShortcut" aria-label="View cart">⌑<span class="cart-count" id="cartCount">0</span></button>
+      <button class="profile-btn" id="profileButton" aria-label="Check ration card status"><span class="avatar" id="avatar">MG</span><span class="profile-copy"><span id="profileName">Mauricio G.</span><small id="profileStatus">Card status not checked</small></span></button>
+    </div>
+  </header>
+  <main>
+    <section class="screen active" id="shopScreen">
+      <div class="welcome-row">
+        <div><p class="eyebrow">Your neighborhood ration shop</p><h1>Quality essentials, fairly priced.</h1><p class="welcome-copy">Shop trusted staples and get them delivered to your doorstep.</p></div>
+        <button class="verified-pill" id="verificationButton"><span>✓</span><span id="verificationLabel">Check card status</span></button>
+      </div>
+      <section class="hero" aria-label="Monthly essentials">
+        <div class="hero-copy">
+          <div class="hero-tag">🌿 &nbsp; Your monthly essentials</div>
+          <h2>Good food. Fair prices.<br>Right at your door.</h2>
+          <p>Shop trusted staples from your local ration shop. Every order is made with care.</p>
+          <button class="button" id="shopNowButton">Explore essentials <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="hero-sun" aria-hidden="true"></div>
+        <div class="hero-art" aria-hidden="true"><div class="grain-bag">🌾</div><div class="grain-bag two">🌱</div></div>
+      </section>
+      <div class="summary-grid">
+        <div class="summary-card"><span class="summary-icon">⚖️</span><span class="summary-copy"><strong>35 kg monthly limit</strong><small>Fair share for every family</small></span></div>
+        <div class="summary-card"><span class="summary-icon">🚚</span><span class="summary-copy"><strong>Pay your way</strong><small>PayTM or cash on delivery</small></span></div>
+      </div>
+      <section class="shop-picker" aria-labelledby="shopPickerTitle">
+        <div class="shop-picker-heading"><div><h2 id="shopPickerTitle">Choose your ration shop</h2><p>Compare nearby shops and select where you’d like to order.</p></div></div>
+        <div class="shop-picker-grid" id="shopPicker"></div>
+      </section>
+      <section class="shop-details" aria-label="Shop details">
+        <div class="shop-detail"><span class="summary-icon">⌖</span><span><strong id="customerShopName">Community Ration Shop</strong><small id="customerShopAddress">12 Market Road, Bengaluru</small></span></div>
+        <div class="shop-detail"><span class="summary-icon">◷</span><span><strong>Shop hours</strong><small id="customerShopHours">Mon–Sat · 9:00 AM–6:00 PM</small></span></div>
+        <span class="status">Local shop · Open today</span>
+      </section>
+      <div class="catalog-layout" id="catalog">
+        <section>
+          <div class="section-heading"><div><h2>Shop essentials</h2><p>Fresh, reliable staples from your local shop</p></div><input id="searchInput" class="search" type="search" placeholder="⌕  Find a product" aria-label="Search products"></div>
+          <div class="category-row" role="group" aria-label="Filter product categories">
+            <button class="category active" data-category="All">All essentials</button><button class="category" data-category="Grains">Grains</button><button class="category" data-category="Pulses">Pulses</button><button class="category" data-category="Pantry">Pantry</button>
+          </div>
+          <div class="product-grid" id="productGrid"></div>
+        </section>
+        <aside class="cart-panel" id="cartPanel" aria-label="Shopping cart">
+          <div class="cart-header"><h2>Your basket</h2><span id="cartItemLabel">0 items</span></div>
+          <div class="cart-items" id="cartItems"><div class="cart-empty">Your basket is waiting for something good.<br>Add a few essentials to get started.</div></div>
+          <div class="cart-details">
+            <div class="limit-box"><div class="limit-top"><strong>Monthly ration limit</strong><span id="limitText">0 / 35 kg</span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><p class="limit-note">You can order up to 35 kg per ration card.</p></div>
+            <div class="total-row"><span>Basket total</span><strong id="cartTotal">₹0</strong></div>
+            <button class="button full" id="checkoutButton" disabled>Continue to checkout <span aria-hidden="true">→</span></button>
+            <p class="safe-note">🔒 &nbsp; Secure checkout · No hidden fees</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <section class="screen" id="ordersScreen">
+      <div class="welcome-row"><div><p class="eyebrow">Order history</p><h1>Your orders</h1><p class="welcome-copy">Keep track of purchases and their payment status.</p></div><span class="verified-pill">✓ &nbsp; Ration card status: valid</span></div>
+      <div class="panel"><div class="panel-heading"><h2>Recent orders</h2><span class="status">Customer view</span></div><div class="table-wrap"><table><thead><tr><th>ORDER</th><th>SHOP</th><th>DATE</th><th>ITEMS</th><th>PAYMENT</th><th>TOTAL</th><th>STATUS</th></tr></thead><tbody id="customerOrders"></tbody></table></div></div>
+      <div class="panel" style="margin-top:16px"><div class="panel-heading"><h2>Need help with an order?</h2><span>We’re here to help</span></div><div class="panel-body"><p class="welcome-copy" style="margin-bottom:14px">Tell us what happened and our shopkeeper will review your complaint.</p><button class="button light" id="complaintButton">＋ &nbsp; Submit a complaint</button></div></div>
+    </section>
+    <section class="screen" id="complaintsScreen">
+      <div class="welcome-row"><div><p class="eyebrow">Customer support</p><h1>Complaints</h1><p class="welcome-copy">Report an order or delivery issue and track it here.</p></div><span class="verified-pill" id="complaintCountBadge">0 submitted</span></div>
+      <section class="panel">
+        <div class="complaint-intro"><div><h2>Something not right with your order?</h2><p>Submit a complaint linked to an order. The shop that handled it will be able to review the details.</p></div><button class="button" id="complaintTabButton">＋ &nbsp; Submit a complaint</button></div>
+      </section>
+      <section class="panel" style="margin-top:16px">
+        <div class="panel-heading"><h2>Your submitted complaints</h2><span>All shops</span></div>
+        <div class="complaint-list" id="customerComplaints"></div>
+      </section>
+    </section>
+    <section class="screen" id="shopkeeperScreen">
+      <div class="welcome-row"><div><p class="eyebrow">Shopkeeper workspace</p><h1>Shop overview</h1><p class="welcome-copy">Managing <strong id="managedShopName">Community Ration Shop</strong> · Manage its stock, orders, and transactions.</p></div><button class="button light" id="shopInfoButton">✎ &nbsp; Shop information</button></div>
+      <div class="metrics"><div class="metric"><small>Today’s transactions</small><strong id="metricTransactions">0</strong><span>Across all payment types</span></div><div class="metric"><small>Online payments</small><strong id="metricOnline">₹0</strong><span>PayTM orders</span></div><div class="metric"><small>Cash on delivery</small><strong id="metricCash">₹0</strong><span>Collected on delivery</span></div></div>
+      <div class="dashboard-grid">
+        <section class="panel"><div class="panel-heading"><h2>Inventory</h2><button class="button light" id="saveStockButton">Save changes</button></div><div class="panel-body"><p class="welcome-copy" style="margin-bottom:16px">Update available stock. Changes appear in the customer shop.</p><div class="inventory-list" id="inventoryList"></div></div></section>
+        <section class="panel"><div class="panel-heading"><h2>Recent orders</h2><span class="status" id="ordersBadge">0 orders</span></div><div class="table-wrap"><table><thead><tr><th>ORDER / CUSTOMER</th><th>PAYMENT</th><th>STATUS</th><th></th></tr></thead><tbody id="shopkeeperOrders"></tbody></table></div></section>
+      </div>
+      <section class="panel" style="margin-top:16px"><div class="panel-heading"><h2>Transaction ledger</h2><span>Payment method is recorded for each order</span></div><div class="table-wrap"><table><thead><tr><th>ORDER</th><th>DATE</th><th>PAYMENT METHOD</th><th>AMOUNT</th><th>STATUS</th></tr></thead><tbody id="transactions"></tbody></table></div></section>
+      <section class="panel" style="margin-top:16px"><div class="panel-heading"><h2>Customer complaints</h2><span class="status" id="complaintsBadge">0 open</span></div><div class="table-wrap"><table><thead><tr><th>COMPLAINT</th><th>ORDER</th><th>DETAILS</th><th>STATUS</th></tr></thead><tbody id="complaintsList"></tbody></table></div></section>
+    </section>
+    <footer class="footer"><span><strong>e-ration.</strong> &nbsp; Food essentials with dignity.</span><span>Prototype for E-Ration Shop · Group 2</span></footer>
+  </main>
+  <div class="modal-backdrop" id="modalBackdrop" role="presentation"><section class="modal" id="modalContent" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></section></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const products = [
+      { id: "rice", name: "Premium rice", category: "Grains", emoji: "🍚", pack: "5 kg bag", kg: 5, price: 220, stock: 42, color: "rice" },
+      { id: "wheat", name: "Whole wheat atta", category: "Grains", emoji: "🌾", pack: "5 kg bag", kg: 5, price: 165, stock: 35, color: "wheat" },
+      { id: "dal", name: "Toor dal", category: "Pulses", emoji: "🫘", pack: "1 kg pack", kg: 1, price: 118, stock: 28, color: "dal" },
+      { id: "oil", name: "Sunflower oil", category: "Pantry", emoji: "🫙", pack: "1 kg tin", kg: 1, price: 142, stock: 20, color: "oil" },
+      { id: "sugar", name: "Refined sugar", category: "Pantry", emoji: "🧂", pack: "2 kg pack", kg: 2, price: 92, stock: 30, color: "sugar" },
+      { id: "salt", name: "Iodized salt", category: "Pantry", emoji: "🧂", pack: "1 kg pack", kg: 1, price: 24, stock: 50, color: "salt" }
+    ];
+    const productArt = {
+      rice: `<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M21 30c8-5 30-5 38 0l-3 33c-9 7-23 7-32 0l-3-33Z" fill="#e8c993" stroke="#a77b49" stroke-width="3" stroke-linejoin="round"/><path d="M21 30c9 5 29 5 38 0" fill="none" stroke="#a77b49" stroke-width="3"/><path d="M26 25c-2-5 1-9 5-9h18c4 0 7 4 5 9" fill="#f4e3bd" stroke="#a77b49" stroke-width="3"/><path d="M32 38c-3 3-3 6 0 8m9-10c-3 3-3 6 0 8m8-6c-3 3-3 6 0 8M30 52c-3 3-3 6 0 8m11-6c-3 3-3 6 0 8m9-8c-3 3-3 6 0 8" fill="none" stroke="#fff9e9" stroke-width="3" stroke-linecap="round"/><path d="M33 28v-6m7 7v-7m7 7v-7" stroke="#a77b49" stroke-width="2" stroke-linecap="round"/></svg>`,
+      wheat: `<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 67V18m0 20c-9-3-15-9-17-18 9 1 15 7 17 18Zm0 12c9-3 15-9 17-18-9 1-15 7-17 18Z" fill="none" stroke="#66834c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 18c-5-2-7-6-6-10 5 1 8 4 8 9m-5 5c-5-2-8-5-8-9 5 1 8 4 10 8m-4 8c-5-2-8-5-8-9 5 1 9 4 11 8m17 2c5-2 8-5 8-9-5 1-9 4-11 8m7-8c5-2 7-6 6-10-5 1-8 4-8 9m4 17c5-2 8-5 8-9-5 1-9 4-11 8" fill="#e2b65d" stroke="#a98038" stroke-width="2" stroke-linejoin="round"/><path d="M28 68h24" stroke="#66834c" stroke-width="4" stroke-linecap="round"/></svg>`,
+      dal: `<svg viewBox="0 0 80 80" aria-hidden="true"><ellipse cx="40" cy="58" rx="25" ry="9" fill="#8c492a"/><path d="M15 48h50c-2 12-10 19-25 19S17 60 15 48Z" fill="#b96136"/><path d="M17 47c3-13 13-21 23-21s20 8 23 21H17Z" fill="#f6d98c"/><ellipse cx="31" cy="37" rx="4" ry="3" fill="#d37c27"/><ellipse cx="42" cy="33" rx="4" ry="3" fill="#e6a33c"/><ellipse cx="51" cy="39" rx="4" ry="3" fill="#c96c24"/><ellipse cx="26" cy="44" rx="4" ry="3" fill="#e3a13b"/><ellipse cx="38" cy="43" rx="4" ry="3" fill="#c96c24"/><ellipse cx="49" cy="46" rx="4" ry="3" fill="#e8ad46"/><path d="M12 48c1 5 6 8 12 8m44-8c-1 5-6 8-12 8" fill="none" stroke="#764326" stroke-width="3" stroke-linecap="round"/></svg>`,
+      oil: `<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M33 10h14v10l7 7v37c0 5-4 8-9 8H35c-5 0-9-3-9-8V27l7-7V10Z" fill="#e0a923" stroke="#91651e" stroke-width="3" stroke-linejoin="round"/><path d="M35 10h10v8H35z" fill="#f5d47d"/><path d="M30 38h20v19H30z" rx="4" fill="#f8edc9"/><path d="M36 52c-2-5 5-7 5-12 6 6 7 10 4 14-3 4-8 3-9-2Z" fill="#e9ad24"/><path d="M34 26h12" stroke="#ffe5a1" stroke-width="3" stroke-linecap="round"/></svg>`,
+      sugar: `<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M24 20c8-5 24-5 32 0l4 9-3 34c-9 6-25 6-34 0l-3-34 4-9Z" fill="#e9c58b" stroke="#a77a43" stroke-width="3" stroke-linejoin="round"/><path d="M25 21c9 5 21 5 30 0" fill="none" stroke="#a77a43" stroke-width="3"/><path d="M29 38h9v9h-9zm13-4h9v9h-9zm-8 14h9v9h-9zm12-2h8v8h-8z" fill="#fffdf2" stroke="#d7d1bd" stroke-width="1.5" stroke-linejoin="round"/><path d="m32 31 2-4 2 4m10 2 2-4 2 4" fill="#fffdf2" stroke="#d7d1bd" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+      salt: `<svg viewBox="0 0 80 80" aria-hidden="true"><path d="M30 18h20l-2 8c7 5 11 12 11 22v14c0 5-4 8-9 8H30c-6 0-10-3-10-8V48c0-10 4-17 11-22l-1-8Z" fill="#dce8e9" stroke="#728e91" stroke-width="3" stroke-linejoin="round"/><path d="M29 18h22v8H29z" fill="#8da9ab" stroke="#728e91" stroke-width="2"/><circle cx="34" cy="22" r="1.4" fill="#f7fbf9"/><circle cx="40" cy="22" r="1.4" fill="#f7fbf9"/><circle cx="46" cy="22" r="1.4" fill="#f7fbf9"/><path d="M25 49h30v15c0 3-3 5-7 5H32c-4 0-7-2-7-5V49Z" fill="#fff"/><circle cx="34" cy="42" r="2" fill="#fff"/><circle cx="42" cy="38" r="2" fill="#fff"/><circle cx="49" cy="44" r="2" fill="#fff"/><circle cx="38" cy="47" r="1.5" fill="#d7e0df"/></svg>`
+    };
+    const shops = [
+      { id: "market-road", name: "Community Ration Shop", area: "Market Road, Bengaluru", address: "12 Market Road, Bengaluru", hours: "Mon–Sat · 9:00 AM–6:00 PM", distance: "0.8 km away", stocks: { rice: 42, wheat: 35, dal: 28, oil: 20, sugar: 30, salt: 50 } },
+      { id: "lake-view", name: "Lakeview Fair Price Shop", area: "Lake View, Bengaluru", address: "8 Lake View Cross, Bengaluru", hours: "Mon–Sat · 8:30 AM–5:30 PM", distance: "1.6 km away", stocks: { rice: 18, wheat: 12, dal: 0, oil: 14, sugar: 22, salt: 31 } },
+      { id: "green-park", name: "Green Park Ration Centre", area: "Green Park, Bengaluru", address: "42 Green Park Main Road, Bengaluru", hours: "Mon–Fri · 9:30 AM–6:30 PM", distance: "2.4 km away", stocks: { rice: 26, wheat: 24, dal: 16, oil: 0, sugar: 18, salt: 40 } }
+    ];
+    const cart = {};
+    const orders = [];
+    const complaints = [];
+    let activeCategory = "All";
+    let currentScreen = "shop";
+    let rationCardValid = false;
+    let selectedShopId = "market-road";
+    let nextOrder = 2408;
+    let nextComplaint = 1;
+    const selectedShop = () => shops.find(shop => shop.id === selectedShopId);
+    const shopById = id => shops.find(shop => shop.id === id);
+    const money = amount => `₹${Number(amount).toLocaleString("en-IN")}`;
+    const productIcon = item => productArt[item.id];
+    const escapeHTML = value => String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+    const product = (id, shopId = selectedShopId) => {
+      const item = products.find(entry => entry.id === id);
+      const shop = shopById(shopId);
+      return item && shop ? { ...item, stock: shop.stocks[id] } : undefined;
+    };
+    const shopProducts = () => products.map(item => product(item.id));
+    const cartWeight = () => Object.entries(cart).reduce((sum, [id, count]) => sum + product(id).kg * count, 0);
+    const cartTotal = () => Object.entries(cart).reduce((sum, [id, count]) => sum + product(id).price * count, 0);
+    const itemCount = () => Object.values(cart).reduce((sum, count) => sum + count, 0);
 
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+    function setScreen(screen) {
+      currentScreen = screen;
+      document.querySelectorAll(".screen").forEach(element => element.classList.toggle("active", element.id === `${screen}Screen`));
+      document.querySelectorAll(".nav-link").forEach(element => element.classList.toggle("active", element.dataset.screen === screen));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (screen === "orders") renderCustomerOrders();
+      if (screen === "complaints") renderCustomerComplaints();
+      if (screen === "shopkeeper") renderShopkeeper();
+    }
+    function renderShopPicker() {
+      document.getElementById("shopPicker").innerHTML = shops.map(shop => `<button class="shop-choice ${shop.id === selectedShopId ? "active" : ""}" data-shop="${shop.id}" aria-pressed="${shop.id === selectedShopId}">
+        <span class="shop-choice-icon">⌖</span><span class="shop-choice-copy"><strong>${escapeHTML(shop.name)}</strong><small>${escapeHTML(shop.area)}</small><small class="shop-distance">${escapeHTML(shop.distance)}</small></span><span class="shop-choice-status">${shop.id === selectedShopId ? "Selected" : "Choose shop"}</span>
+      </button>`).join("");
+      document.querySelectorAll("[data-shop]").forEach(button => button.addEventListener("click", () => switchShop(button.dataset.shop)));
+    }
+    function switchShop(shopId) {
+      if (shopId === selectedShopId) return;
+      const nextShop = shopById(shopId);
+      if (!nextShop) return;
+      if (itemCount()) {
+        openModal(`<div class="modal-top"><div><p class="eyebrow">Change ration shop</p><h2 id="modalTitle">Switch to ${escapeHTML(nextShop.name)}?</h2><p>Your basket is specific to the current shop. Switching shops will clear it.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div><div class="order-confirm">${itemCount()} ${itemCount() === 1 ? "item" : "items"} · ${cartWeight()} kg · ${money(cartTotal())}</div><div style="display:flex;gap:9px"><button class="button secondary" type="button" data-close style="flex:1">Keep my basket</button><button class="button" type="button" id="confirmShopSwitch" style="flex:1">Switch shop</button></div>`);
+        document.getElementById("confirmShopSwitch").addEventListener("click", () => {
+          Object.keys(cart).forEach(id => delete cart[id]);
+          selectedShopId = shopId;
+          closeModal();
+          refreshSelectedShop();
+          showToast(`Shop changed to ${nextShop.name}. Your basket was cleared.`);
+        });
+        bindClose();
+        return;
+      }
+      selectedShopId = shopId;
+      refreshSelectedShop();
+      showToast(`Now showing ${nextShop.name}.`);
+    }
+    function refreshSelectedShop() {
+      renderShopPicker();
+      renderShopInfo();
+      renderProducts();
+      renderCart();
+      if (currentScreen === "shopkeeper") renderShopkeeper();
+    }
+    function renderProducts() {
+      const search = document.getElementById("searchInput").value.trim().toLowerCase();
+      const filtered = shopProducts().filter(item => (activeCategory === "All" || item.category === activeCategory) && item.name.toLowerCase().includes(search));
+      document.getElementById("productGrid").innerHTML = filtered.map(item => {
+        const quantity = cart[item.id] || 0;
+        const unavailable = item.stock <= 0;
+        return `<article class="product-card">
+          <div class="product-visual ${item.color}"><span class="stock-badge">${unavailable ? "Out of stock" : `${item.stock} in stock`}</span><span class="emoji" aria-hidden="true">${productIcon(item)}</span></div>
+          <div class="product-info"><h3>${item.name}</h3><div class="product-meta"><span>${item.pack}</span><span>${item.kg} kg each</span></div>
+            <div class="product-bottom"><span class="price">${money(item.price)} <small>/ pack</small></span>
+            ${quantity ? `<div class="qty-control"><button aria-label="Remove one ${item.name}" data-action="decrease" data-id="${item.id}">−</button><span>${quantity}</span><button aria-label="Add one ${item.name}" data-action="increase" data-id="${item.id}">＋</button></div>` : `<button class="add-btn" aria-label="Add ${item.name} to basket" data-action="increase" data-id="${item.id}" ${unavailable ? "disabled" : ""}>＋</button>`}</div>
+          </div>
+        </article>`;
+      }).join("") || `<p class="cart-empty">No essentials match that search. Try another name.</p>`;
+      document.getElementById("productGrid").querySelectorAll("[data-action]").forEach(button => button.addEventListener("click", () => changeQuantity(button.dataset.id, button.dataset.action === "increase" ? 1 : -1)));
+    }
+    function renderCart() {
+      const entries = Object.entries(cart).filter(([, count]) => count > 0);
+      document.getElementById("cartCount").textContent = itemCount();
+      document.getElementById("cartItemLabel").textContent = `${itemCount()} ${itemCount() === 1 ? "item" : "items"}`;
+      document.getElementById("cartItems").innerHTML = entries.length ? entries.map(([id, count]) => {
+        const item = product(id);
+        return `<div class="cart-line"><span class="mini">${productIcon(item)}</span><span><strong>${item.name}</strong><small>${count} × ${item.pack}</small></span><b>${money(count * item.price)}</b></div>`;
+      }).join("") : `<div class="cart-empty">Your basket is waiting for something good.<br>Add a few essentials to get started.</div>`;
+      document.getElementById("limitText").textContent = `${cartWeight()} / 35 kg`;
+      document.getElementById("progressFill").style.width = `${Math.min(100, cartWeight() / 35 * 100)}%`;
+      document.getElementById("cartTotal").textContent = money(cartTotal());
+      document.getElementById("checkoutButton").disabled = !entries.length;
+    }
+    function changeQuantity(id, change) {
+      if (change > 0 && cartWeight() + product(id).kg > 35) return showToast("Your order can’t exceed the 35 kg ration limit.");
+      if (change > 0 && (cart[id] || 0) >= product(id).stock) return showToast("That quantity is not available in current stock.");
+      cart[id] = Math.max(0, (cart[id] || 0) + change);
+      if (!cart[id]) delete cart[id];
+      renderProducts();
+      renderCart();
+      renderShopInfo();
+    }
+    function openModal(html) {
+      document.getElementById("modalContent").innerHTML = html;
+      document.getElementById("modalBackdrop").classList.add("open");
+      const focusable = document.querySelector("#modalContent input, #modalContent button, #modalContent textarea");
+      if (focusable) focusable.focus();
+    }
+    function closeModal() { document.getElementById("modalBackdrop").classList.remove("open"); }
+    function openVerification() {
+      openModal(`<div class="modal-top"><div><p class="eyebrow">Ration card eligibility</p><h2 id="modalTitle">Check ration card status</h2><p>Use Aadhaar / OTP to check whether the ration card is valid. This checks card status only; it does not verify that you are the cardholder.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
+        <form id="verifyForm"><div class="form-field"><label for="aadhaar">Aadhaar number for status check</label><input id="aadhaar" inputmode="numeric" maxlength="12" placeholder="Enter 12-digit Aadhaar number" required pattern="[0-9]{12}"><span class="form-hint">Prototype only — use any 12 digits and demo OTP 123456. This simulates a valid-card result; it does not contact Aadhaar services or verify cardholder identity.</span></div>
+        <div class="form-field"><label for="otp">One-time password</label><input id="otp" inputmode="numeric" maxlength="6" placeholder="Enter demo OTP: 123456" required pattern="[0-9]{6}"></div><button class="button full" type="submit">Verify &amp; continue</button></form>`);
+      document.getElementById("verifyForm").addEventListener("submit", event => {
+        event.preventDefault();
+        if (document.getElementById("otp").value !== "123456") {
+          showToast("That demo OTP is incorrect. Enter 123456 to continue.");
+          return;
+        }
+        rationCardValid = true;
+        document.getElementById("profileStatus").textContent = "Ration card status: valid";
+        document.getElementById("verificationLabel").textContent = "Ration card valid";
+        document.getElementById("verificationButton").classList.add("verified-pill");
+        closeModal();
+        showToast("Ration card status checked: valid. You’re ready to shop.");
+      });
+      bindClose();
+    }
+    function completeRationCardCheck() {
+      rationCardValid = true;
+      document.getElementById("profileStatus").textContent = "Ration card status: valid";
+      document.getElementById("verificationLabel").textContent = "Ration card valid";
+      document.getElementById("verificationButton").classList.add("verified-pill");
+      const splash = document.getElementById("loginSplash");
+      splash.hidden = true;
+      document.querySelector("header").inert = false;
+      document.querySelector("main").inert = false;
+      document.body.style.overflow = "";
+      showToast("Ration card status checked: valid. You’re ready to shop.");
+    }
+    function openCheckout() {
+      if (!rationCardValid) return openVerification();
+      if (!itemCount()) return;
+      openModal(`<div class="modal-top"><div><p class="eyebrow">Almost there</p><h2 id="modalTitle">Complete your order</h2><p>${cartWeight()} kg of essentials · ${money(cartTotal())}</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
+        <form id="checkoutForm"><div class="form-field"><label for="deliveryAddress">Delivery address</label><input id="deliveryAddress" required placeholder="House, street, area and PIN code"></div><p style="font-size:10px;font-weight:750;margin:17px 0 8px">Choose a payment method</p>
+        <label class="payment-option"><input type="radio" name="payment" value="PayTM" checked><span><strong>PayTM</strong><small>Secure online payment</small></span><span style="margin-left:auto;color:var(--green);font-weight:800">PayTM</span></label>
+        <label class="payment-option"><input type="radio" name="payment" value="Cash on delivery"><span><strong>Cash on delivery</strong><small>Pay the shopkeeper when your order arrives</small></span><span style="margin-left:auto">💵</span></label>
+        <div class="order-confirm"><strong>Order total</strong><span style="float:right"><strong>${money(cartTotal())}</strong></span><br>${cartWeight()} kg · ${itemCount()} packs</div><button class="button full" type="submit">Place order · ${money(cartTotal())}</button></form>`);
+      document.getElementById("checkoutForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const payment = new FormData(event.currentTarget).get("payment");
+        const shop = selectedShop();
+        const items = Object.entries(cart).map(([id, count]) => {
+          const item = product(id);
+          return { id, count, name: item.name, emoji: item.emoji, pack: item.pack, kg: item.kg, price: item.price };
+        });
+        const order = { id: `ER-${nextOrder++}`, shopId: shop.id, shopName: shop.name, date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }), items, amount: cartTotal(), weight: cartWeight(), payment, status: "Processing" };
+        orders.unshift(order);
+        items.forEach(({ id, count }) => { shop.stocks[id] -= count; });
+        Object.keys(cart).forEach(id => delete cart[id]);
+        closeModal();
+        renderProducts();
+        renderCart();
+        showToast(`Order ${order.id} placed successfully.`);
+      });
+      bindClose();
+    }
+    function renderCustomerOrders() {
+      const tbody = document.getElementById("customerOrders");
+      tbody.innerHTML = orders.length ? orders.map(order => `<tr><td><strong>${order.id}</strong></td><td>${escapeHTML(order.shopName)}</td><td>${order.date}</td><td>${order.items.reduce((sum, item) => sum + item.count, 0)} packs · ${order.weight} kg</td><td>${order.payment}</td><td><strong>${money(order.amount)}</strong></td><td><span class="status ${order.status === "Rejected" ? "rejected" : order.status === "Processing" ? "pending" : ""}">${order.status}</span></td></tr>`).join("") : `<tr><td colspan="7" class="empty-orders">No orders yet. Your next essentials order will appear here.</td></tr>`;
+    }
+    function renderShopkeeper() {
+      const shop = selectedShop();
+      const shopOrders = orders.filter(order => order.shopId === shop.id);
+      const shopComplaints = complaints.filter(complaint => complaint.shopId === shop.id);
+      document.getElementById("managedShopName").textContent = shop.name;
+      document.getElementById("inventoryList").innerHTML = shopProducts().map(item => `<div class="inventory-item"><span class="mini">${productIcon(item)}</span><span><strong>${item.name}</strong><small>${money(item.price)} per ${item.pack}</small></span><label><span class="form-hint">Stock (packs)</span><input class="stock-input" type="number" min="0" data-stock="${item.id}" value="${item.stock}" aria-label="${item.name} stock in packs"></label></div>`).join("");
+      const ordersRows = shopOrders.length ? shopOrders.map(order => `<tr><td><strong>${order.id}</strong><br><span class="form-hint">Mauricio G. · ${order.weight} kg</span></td><td>${order.payment}</td><td><span class="status ${order.status === "Rejected" ? "rejected" : order.status === "Processing" ? "pending" : ""}">${order.status}</span></td><td>${order.status === "Processing" ? `<button class="table-action" data-reject="${order.id}">Reject</button>` : ""}</td></tr>`).join("") : `<tr><td colspan="4" class="empty-orders">New customer orders for ${escapeHTML(shop.name)} will appear here.</td></tr>`;
+      document.getElementById("shopkeeperOrders").innerHTML = ordersRows;
+      document.getElementById("transactions").innerHTML = shopOrders.length ? shopOrders.map(order => `<tr><td><strong>${order.id}</strong></td><td>${order.date}</td><td>${order.payment}</td><td><strong>${money(order.amount)}</strong></td><td><span class="status ${order.status === "Rejected" ? "rejected" : ""}">${order.status === "Rejected" ? "Refund / review" : order.payment === "PayTM" ? "Paid online" : "Due on delivery"}</span></td></tr>`).join("") : `<tr><td colspan="5" class="empty-orders">Transactions for this shop will appear here as orders are placed.</td></tr>`;
+      document.getElementById("ordersBadge").textContent = `${shopOrders.length} ${shopOrders.length === 1 ? "order" : "orders"}`;
+      const online = shopOrders.filter(order => order.payment === "PayTM").reduce((sum, order) => sum + order.amount, 0);
+      const cash = shopOrders.filter(order => order.payment === "Cash on delivery").reduce((sum, order) => sum + order.amount, 0);
+      document.getElementById("metricTransactions").textContent = shopOrders.length;
+      document.getElementById("metricOnline").textContent = money(online);
+      document.getElementById("metricCash").textContent = money(cash);
+      document.getElementById("complaintsBadge").textContent = `${shopComplaints.length} open`;
+      document.getElementById("complaintsList").innerHTML = shopComplaints.length ? shopComplaints.map(complaint => `<tr><td><strong>${escapeHTML(complaint.id)}</strong></td><td>${escapeHTML(complaint.order)}</td><td>${escapeHTML(complaint.details)}</td><td><span class="status pending">Needs review</span></td></tr>`).join("") : `<tr><td colspan="4" class="empty-orders">Customer complaints for this shop will appear here.</td></tr>`;
+      document.querySelectorAll("[data-reject]").forEach(button => button.addEventListener("click", () => rejectOrder(button.dataset.reject)));
+      document.getElementById("saveStockButton").onclick = () => {
+        document.querySelectorAll("[data-stock]").forEach(input => {
+          const quantity = Number(input.value);
+          if (Number.isInteger(quantity) && quantity >= 0) shop.stocks[input.dataset.stock] = quantity;
+        });
+        renderProducts();
+        showToast("Inventory updated and visible in the customer shop.");
+      };
+    }
+    function rejectOrder(id) {
+      const order = orders.find(item => item.id === id);
+      if (!order || order.status !== "Processing") return;
+      order.status = "Rejected";
+      const shop = shopById(order.shopId);
+      order.items.forEach(({ id: itemId, count }) => { shop.stocks[itemId] += count; });
+      renderProducts();
+      renderShopkeeper();
+      renderCustomerOrders();
+      showToast(`Order ${id} rejected. Customer email notification queued (prototype).`);
+    }
+    function submitComplaint() {
+      const orderChoices = orders.map(order => `<option value="${escapeHTML(order.id)}">${escapeHTML(order.id)} · ${escapeHTML(order.shopName)}</option>`).join("");
+      openModal(`<div class="modal-top"><div><p class="eyebrow">Customer support</p><h2 id="modalTitle">Tell us what happened</h2><p>Share an order or delivery issue for the shopkeeper to review.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
+        <form id="complaintForm"><div class="form-field"><label for="complaintOrder">Order</label><select id="complaintOrder" required>${orderChoices || '<option value="">No orders yet</option>'}</select></div><div class="form-field"><label for="complaintDetails">What went wrong?</label><textarea id="complaintDetails" required maxlength="500" placeholder="Describe the issue with your order or delivery"></textarea></div><button class="button full" type="submit">Submit complaint</button></form>`);
+      document.getElementById("complaintForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const order = orders.find(item => item.id === document.getElementById("complaintOrder").value);
+        if (!order) return;
+        complaints.unshift({ id: `CP-${String(nextComplaint++).padStart(3, "0")}`, order: order.id, shopId: order.shopId, details: document.getElementById("complaintDetails").value, date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }), status: "Needs review" });
+        closeModal();
+        renderShopkeeper();
+        renderCustomerComplaints();
+        showToast("Complaint submitted. The shopkeeper can review it in their workspace.");
+      });
+      bindClose();
+    }
+    function renderCustomerComplaints() {
+      document.getElementById("complaintCountBadge").textContent = `${complaints.length} submitted`;
+      document.getElementById("customerComplaints").innerHTML = complaints.length ? complaints.map(complaint => {
+        const shop = shopById(complaint.shopId);
+        return `<article class="complaint-card"><span><strong>${escapeHTML(complaint.id)} · Order ${escapeHTML(complaint.order)}</strong><small>${escapeHTML(complaint.date)} · ${escapeHTML(shop ? shop.name : "Ration shop")}</small></span><small class="complaint-details">${escapeHTML(complaint.details)}</small><span class="status pending">${escapeHTML(complaint.status)}</span></article>`;
+      }).join("") : `<div class="empty-orders">You haven’t submitted any complaints yet.</div>`;
+    }
+    function bindClose() { document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", closeModal)); }
+    function renderShopInfo() {
+      const shop = selectedShop();
+      document.getElementById("customerShopName").textContent = shop.name;
+      document.getElementById("customerShopAddress").textContent = shop.address;
+      document.getElementById("customerShopHours").textContent = shop.hours;
+      document.getElementById("managedShopName").textContent = shop.name;
+    }
+
+    document.querySelectorAll(".nav-link").forEach(button => button.addEventListener("click", () => setScreen(button.dataset.screen)));
+    document.getElementById("loginForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const feedback = document.getElementById("loginFeedback");
+      if (document.getElementById("loginOtp").value !== "123456") {
+        feedback.textContent = "Card status could not be confirmed. For the demo, enter OTP 123456.";
+        document.getElementById("loginOtp").focus();
+        return;
+      }
+      feedback.textContent = "";
+      completeRationCardCheck();
+    });
+    document.getElementById("loginOtp").addEventListener("input", () => {
+      document.getElementById("loginFeedback").textContent = "";
+    });
+    document.getElementById("cartShortcut").addEventListener("click", () => {
+      setScreen("shop");
+      document.getElementById("cartPanel").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    document.getElementById("profileButton").addEventListener("click", openVerification);
+    document.getElementById("verificationButton").addEventListener("click", openVerification);
+    document.getElementById("checkoutButton").addEventListener("click", openCheckout);
+    document.getElementById("searchInput").addEventListener("input", renderProducts);
+    document.querySelectorAll(".category").forEach(button => button.addEventListener("click", () => {
+      activeCategory = button.dataset.category;
+      document.querySelectorAll(".category").forEach(category => category.classList.toggle("active", category === button));
+      renderProducts();
+    }));
+    document.getElementById("shopNowButton").addEventListener("click", () => document.getElementById("catalog").scrollIntoView({ behavior: "smooth" }));
+    document.getElementById("complaintButton").addEventListener("click", submitComplaint);
+    document.getElementById("complaintTabButton").addEventListener("click", submitComplaint);
+    document.getElementById("shopInfoButton").addEventListener("click", () => {
+      openModal(`<div class="modal-top"><div><p class="eyebrow">Shop profile</p><h2 id="modalTitle">Local shop information</h2><p>Keep customers up to date with your shop details.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div><form id="shopInfoForm"><div class="form-field"><label for="shopName">Shop name</label><input id="shopName" required></div><div class="form-field"><label for="shopAddress">Address</label><input id="shopAddress" required></div><div class="form-field"><label for="shopHours">Shop hours</label><input id="shopHours" required></div><button class="button full" type="submit">Save shop details</button></form>`);
+      const shop = selectedShop();
+      document.getElementById("shopName").value = shop.name;
+      document.getElementById("shopAddress").value = shop.address;
+      document.getElementById("shopHours").value = shop.hours;
+    });
+    document.getElementById("modalBackdrop").addEventListener("click", event => { if (event.target.id === "modalBackdrop") closeModal(); });
+    document.addEventListener("keydown", event => { if (event.key === "Escape") closeModal(); });
+    document.addEventListener("submit", event => {
+      if (event.target.id === "shopInfoForm") {
+        event.preventDefault();
+        const shop = selectedShop();
+        shop.name = document.getElementById("shopName").value;
+        shop.address = document.getElementById("shopAddress").value;
+        shop.hours = document.getElementById("shopHours").value;
+        renderShopInfo();
+        renderShopPicker();
+        renderShopkeeper();
+        closeModal();
+        showToast(`${shop.name} information saved and shared with customers.`);
+      }
+    });
+    renderShopPicker();
+    renderProducts();
+    renderCart();
+    renderCustomerComplaints();
+    document.querySelector("header").inert = true;
+    document.querySelector("main").inert = true;
+    document.body.style.overflow = "hidden";
+    document.getElementById("loginAadhaar").focus();
+  </script>
+</body>
+</html>
