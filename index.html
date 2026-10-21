@@ -205,8 +205,6 @@
     .login-brand .brand-mark { width: 38px; height: 38px; }
     .login-card h1 { margin-bottom: 10px; font-size: 30px; }
     .login-copy { margin-bottom: 22px; color: var(--muted); font-size: 12px; line-height: 1.7; }
-    .login-security { display: flex; gap: 10px; padding: 12px; margin: 16px 0 18px; border-radius: 11px; color: var(--green); background: #f3f8f1; font-size: 10px; line-height: 1.55; }
-    .login-security strong { display: block; margin-bottom: 2px; font-size: 10px; }
     .login-feedback { min-height: 18px; margin: 9px 0 0; color: #a13f35; font-size: 10px; }
     .login-demo-note { margin: 14px 0 0; color: var(--muted); font-size: 9px; line-height: 1.6; text-align: center; }
     .modal { width: min(460px, 100%); max-height: min(90vh, 760px); overflow: auto; padding: 24px; border-radius: 19px; background: #fff; box-shadow: 0 24px 70px rgba(0,0,0,.18); }
@@ -305,11 +303,10 @@
       <div class="login-brand"><span class="brand-mark">✳</span><span>E-Ration Shop</span></div>
       <p class="eyebrow">Ration card eligibility</p>
       <h1 id="loginTitle">Check your ration card</h1>
-      <p class="login-copy" id="loginDescription">Check your ration card status before entering the shop. Aadhaar / OTP checks card validity only, not who is using the card.</p>
+      <p class="login-copy" id="loginDescription">Check your ration card status before entering the shop.</p>
       <form id="loginForm">
         <div class="form-field"><label for="loginAadhaar">Aadhaar number for status check</label><input id="loginAadhaar" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Enter 12-digit Aadhaar number" required pattern="[0-9]{12}"></div>
         <div class="form-field"><label for="loginOtp">One-time password</label><input id="loginOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter one-time password" required pattern="[0-9]{6}"></div>
-        <div class="login-security"><span aria-hidden="true">✓</span><span><strong>Card status check only</strong>This checks ration card validity, not customer identity.</span></div>
         <button class="button full" type="submit">Check card status &amp; continue →</button>
         <p class="login-feedback" id="loginFeedback" role="alert" aria-live="polite"></p>
       </form>
@@ -576,7 +573,7 @@
       showToast(`Switched to ${role === "shopkeeper" ? "Shopkeeper" : "Customer"} demo view.`);
     }
     function openVerification() {
-      openModal(`<div class="modal-top"><div><p class="eyebrow">Ration card eligibility</p><h2 id="modalTitle">Check ration card status</h2><p>Aadhaar / OTP checks card validity only, not who is using the card.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
+      openModal(`<div class="modal-top"><div><p class="eyebrow">Ration card eligibility</p><h2 id="modalTitle">Check ration card status</h2><p>Use Aadhaar / OTP to check your ration card status.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
         <form id="verifyForm"><div class="form-field"><label for="aadhaar">Aadhaar number for status check</label><input id="aadhaar" inputmode="numeric" maxlength="12" placeholder="Enter 12-digit Aadhaar number" required pattern="[0-9]{12}"><span class="form-hint">Prototype only — use any 12 digits and demo OTP 123456. This simulates a valid-card result and does not contact Aadhaar services.</span></div>
         <div class="form-field"><label for="otp">One-time password</label><input id="otp" inputmode="numeric" maxlength="6" placeholder="Enter demo OTP: 123456" required pattern="[0-9]{6}"></div><button class="button full" type="submit">Verify &amp; continue</button></form>`);
       document.getElementById("verifyForm").addEventListener("submit", event => {
