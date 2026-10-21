@@ -224,6 +224,15 @@
     .payment-option input { accent-color: var(--green); }
     .payment-option strong { display: block; font-size: 11px; }
     .payment-option small { color: var(--muted); font-size: 9px; }
+    .paytm-window { overflow: hidden; margin: 0 0 15px; border: 1px solid var(--line); border-radius: 13px; background: #fbfcff; }
+    .paytm-window-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); background: #fff; }
+    .paytm-wordmark { color: #0756a5; font-size: 17px; font-weight: 850; letter-spacing: -.7px; }
+    .demo-tag { padding: 5px 7px; border-radius: 99px; color: #755016; background: #fff2d7; font-size: 8px; font-weight: 800; letter-spacing: .5px; }
+    .paytm-window-body { padding: 17px; text-align: center; }
+    .paytm-window-body p { margin: 0 0 13px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .paytm-amount { display: block; margin-bottom: 13px; font-size: 25px; font-weight: 850; letter-spacing: -.7px; }
+    .demo-qr { display: block; width: 112px; height: 112px; margin: 0 auto 12px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .paytm-window-body .paytm-demo-warning { margin: 12px 0 0; color: #866526; font-size: 9px; }
     .order-confirm { padding: 12px; margin: 14px 0; border-radius: 10px; background: var(--canvas); font-size: 10px; line-height: 1.6; }
     .toast { position: fixed; right: 22px; bottom: 22px; z-index: 30; max-width: min(360px, calc(100vw - 44px)); padding: 13px 16px; border-radius: 11px; color: #fff; background: #263b2c; box-shadow: var(--shadow); font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(12px); transition: all .2s ease; }
     .toast.show { opacity: 1; transform: translateY(0); }
@@ -296,7 +305,7 @@
       <div class="login-brand"><span class="brand-mark">✳</span><span>E-Ration Shop</span></div>
       <p class="eyebrow">Ration card eligibility</p>
       <h1 id="loginTitle">Check your ration card</h1>
-      <p class="login-copy" id="loginDescription">Check that your ration card is valid before entering the shop. Aadhaar / OTP is used for the card status check only; it does not verify that you are the cardholder.</p>
+      <p class="login-copy" id="loginDescription">Check your ration card status before entering the shop. Aadhaar / OTP checks card validity only, not who is using the card.</p>
       <form id="loginForm">
         <div class="form-field"><label for="loginAadhaar">Aadhaar number for status check</label><input id="loginAadhaar" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="Enter 12-digit Aadhaar number" required pattern="[0-9]{12}"></div>
         <div class="form-field"><label for="loginOtp">One-time password</label><input id="loginOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter one-time password" required pattern="[0-9]{6}"></div>
@@ -313,17 +322,17 @@
       <button class="nav-link active" data-screen="shop">Shop</button>
       <button class="nav-link" data-screen="orders">My orders</button>
       <button class="nav-link" data-screen="complaints">File Complaint/Help</button>
-      <button class="nav-link" data-screen="shopkeeper">Shopkeeper</button>
+      <button class="nav-link" id="shopkeeperNavButton" data-screen="shopkeeper" hidden>Shopkeeper</button>
     </nav>
     <div class="top-actions">
       <button class="icon-btn" id="cartShortcut" aria-label="View cart">⌑<span class="cart-count" id="cartCount">0</span></button>
-      <button class="profile-btn" id="profileButton" aria-label="Check ration card status"><span class="avatar" id="avatar">MG</span><span class="profile-copy"><span id="profileName">Mauricio G.</span><small id="profileStatus">Card status not checked</small></span></button>
+      <button class="profile-btn" id="profileButton" aria-label="Profile and demo role"><span class="avatar" id="avatar">TC</span><span class="profile-copy"><span id="profileName">Test Customer</span><small id="profileStatus">Card Status Not Checked</small></span></button>
     </div>
   </header>
   <main>
     <section class="screen active" id="shopScreen">
       <div class="welcome-row">
-        <div><p class="eyebrow">Your neighborhood ration shop</p><h1>Quality essentials, fairly priced.</h1><p class="welcome-copy">Shop trusted staples and get them delivered to your doorstep.</p></div>
+        <div><p class="eyebrow">Everyday essentials, close to home</p><h1>Quality essentials, fairly priced.</h1><p class="welcome-copy">Shop trusted staples and get them delivered to your doorstep.</p></div>
         <button class="verified-pill" id="verificationButton"><span>✓</span><span id="verificationLabel">Check card status</span></button>
       </div>
       <section class="hero" aria-label="Monthly essentials">
@@ -337,7 +346,7 @@
         <div class="hero-art" aria-hidden="true"><div class="grain-bag">🌾</div><div class="grain-bag two">🌱</div></div>
       </section>
       <div class="summary-grid">
-        <div class="summary-card"><span class="summary-icon">⚖️</span><span class="summary-copy"><strong>35 kg monthly limit</strong><small>Fair share for every family</small></span></div>
+        <div class="summary-card"><span class="summary-icon">⚖️</span><span class="summary-copy"><strong>35 kg food limit</strong><small>Reset period not specified</small></span></div>
         <div class="summary-card"><span class="summary-icon">🚚</span><span class="summary-copy"><strong>Pay your way</strong><small>PayTM or cash on delivery</small></span></div>
       </div>
       <section class="shop-picker" aria-labelledby="shopPickerTitle">
@@ -361,7 +370,7 @@
           <div class="cart-header"><h2>Your basket</h2><span id="cartItemLabel">0 items</span></div>
           <div class="cart-items" id="cartItems"><div class="cart-empty">Your basket is waiting for something good.<br>Add a few essentials to get started.</div></div>
           <div class="cart-details">
-            <div class="limit-box"><div class="limit-top"><strong>Monthly ration limit</strong><span id="limitText">0 / 35 kg</span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><p class="limit-note">You can order up to 35 kg per ration card.</p></div>
+            <div class="limit-box"><div class="limit-top"><strong>Session ration limit</strong><span id="limitText">0 / 35 kg</span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><p class="limit-note">This prototype caps total orders at 35 kg in this session. When the ration-card limit resets is not yet specified.</p></div>
             <div class="total-row"><span>Basket total</span><strong id="cartTotal">₹0</strong></div>
             <button class="button full" id="checkoutButton" disabled>Continue to checkout <span aria-hidden="true">→</span></button>
             <p class="safe-note">🔒 &nbsp; Secure checkout · No hidden fees</p>
@@ -370,7 +379,7 @@
       </div>
     </section>
     <section class="screen" id="ordersScreen">
-      <div class="welcome-row"><div><p class="eyebrow">Order history</p><h1>Your orders</h1><p class="welcome-copy">Keep track of purchases and their payment status.</p></div><span class="verified-pill">✓ &nbsp; Ration card status: valid</span></div>
+      <div class="welcome-row"><div><p class="eyebrow">Order history</p><h1>Your orders</h1><p class="welcome-copy">Keep track of purchases and their payment status.</p></div><span class="verified-pill">✓ &nbsp; Ration Card Status: Valid</span></div>
       <div class="panel"><div class="panel-heading"><h2>Recent orders</h2><span class="status">Customer view</span></div><div class="table-wrap"><table><thead><tr><th>ORDER</th><th>SHOP</th><th>DATE</th><th>ITEMS</th><th>PAYMENT</th><th>TOTAL</th><th>STATUS</th></tr></thead><tbody id="customerOrders"></tbody></table></div></div>
       <div class="panel" style="margin-top:16px"><div class="panel-heading"><h2>Need help with an order?</h2><span>We’re here to help</span></div><div class="panel-body"><p class="welcome-copy" style="margin-bottom:14px">Tell us what happened and our shopkeeper will review your complaint.</p><button class="button light" id="complaintButton">＋ &nbsp; Submit a complaint</button></div></div>
     </section>
@@ -392,9 +401,9 @@
         <section class="panel"><div class="panel-heading"><h2>Recent orders</h2><span class="status" id="ordersBadge">0 orders</span></div><div class="table-wrap"><table><thead><tr><th>ORDER / CUSTOMER</th><th>PAYMENT</th><th>STATUS</th><th></th></tr></thead><tbody id="shopkeeperOrders"></tbody></table></div></section>
       </div>
       <section class="panel" style="margin-top:16px"><div class="panel-heading"><h2>Transaction ledger</h2><span>Payment method is recorded for each order</span></div><div class="table-wrap"><table><thead><tr><th>ORDER</th><th>DATE</th><th>PAYMENT METHOD</th><th>AMOUNT</th><th>STATUS</th></tr></thead><tbody id="transactions"></tbody></table></div></section>
-      <section class="panel" style="margin-top:16px"><div class="panel-heading"><h2>Customer complaints</h2><span class="status" id="complaintsBadge">0 open</span></div><div class="table-wrap"><table><thead><tr><th>COMPLAINT</th><th>ORDER</th><th>DETAILS</th><th>STATUS</th></tr></thead><tbody id="complaintsList"></tbody></table></div></section>
+      <section class="panel" style="margin-top:16px"><div class="panel-heading"><h2>Customer complaints</h2><span class="status" id="complaintsBadge">0 open</span></div><div class="table-wrap"><table><thead><tr><th>COMPLAINT</th><th>ORDER</th><th>DETAILS</th><th>STATUS</th><th></th></tr></thead><tbody id="complaintsList"></tbody></table></div></section>
     </section>
-    <footer class="footer"><span><strong>e-ration.</strong> &nbsp; Food essentials with dignity.</span><span>Prototype for E-Ration Shop · Group 2</span></footer>
+    <footer class="footer"><span><strong>E-Ration Shop</strong> &nbsp; Food essentials with dignity.</span><span>Prototype for E-Ration Shop · Group 2</span></footer>
   </main>
   <div class="modal-backdrop" id="modalBackdrop" role="presentation"><section class="modal" id="modalContent" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></section></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -425,6 +434,7 @@
     const complaints = [];
     let activeCategory = "All";
     let currentScreen = "shop";
+    let currentRole = "customer";
     let rationCardValid = false;
     let selectedShopId = "market-road";
     let nextOrder = 2408;
@@ -432,6 +442,9 @@
     const selectedShop = () => shops.find(shop => shop.id === selectedShopId);
     const shopById = id => shops.find(shop => shop.id === id);
     const money = amount => `₹${Number(amount).toLocaleString("en-IN")}`;
+    const rationLimitKg = 35;
+    const orderedRationWeight = () => orders.filter(order => order.status !== "Rejected").reduce((sum, order) => sum + order.weight, 0);
+    const remainingRationWeight = () => Math.max(0, rationLimitKg - orderedRationWeight() - cartWeight());
     const productIcon = item => productArt[item.id];
     const escapeHTML = value => String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
     const product = (id, shopId = selectedShopId) => {
@@ -452,6 +465,10 @@
       showToast.timer = setTimeout(() => toast.classList.remove("show"), 2800);
     }
     function setScreen(screen) {
+      if (screen === "shopkeeper" && currentRole !== "shopkeeper") {
+        showToast("Switch to the Shopkeeper demo role from your profile to continue.");
+        return;
+      }
       currentScreen = screen;
       document.querySelectorAll(".screen").forEach(element => element.classList.toggle("active", element.id === `${screen}Screen`));
       document.querySelectorAll(".nav-link").forEach(element => element.classList.toggle("active", element.dataset.screen === screen));
@@ -503,7 +520,7 @@
           <div class="product-visual ${item.color}"><span class="stock-badge">${unavailable ? "Out of stock" : `${item.stock} in stock`}</span><span class="emoji" aria-hidden="true">${productIcon(item)}</span></div>
           <div class="product-info"><h3>${item.name}</h3><div class="product-meta"><span>${item.pack}</span><span>${item.kg} kg each</span></div>
             <div class="product-bottom"><span class="price">${money(item.price)} <small>/ pack</small></span>
-            ${quantity ? `<div class="qty-control"><button aria-label="Remove one ${item.name}" data-action="decrease" data-id="${item.id}">−</button><span>${quantity}</span><button aria-label="Add one ${item.name}" data-action="increase" data-id="${item.id}">＋</button></div>` : `<button class="add-btn" aria-label="Add ${item.name} to basket" data-action="increase" data-id="${item.id}" ${unavailable ? "disabled" : ""}>＋</button>`}</div>
+            ${quantity ? `<div class="qty-control"><button aria-label="Remove one ${item.name}" data-action="decrease" data-id="${item.id}">−</button><span>${quantity}</span><button class="add-btn" aria-label="Add one ${item.name}" data-action="increase" data-id="${item.id}" ${unavailable || remainingRationWeight() < item.kg ? "disabled" : ""}>＋</button></div>` : `<button class="add-btn" aria-label="Add ${item.name} to basket" data-action="increase" data-id="${item.id}" ${unavailable || remainingRationWeight() < item.kg ? "disabled" : ""}>＋</button>`}</div>
           </div>
         </article>`;
       }).join("") || `<p class="cart-empty">No essentials match that search. Try another name.</p>`;
@@ -517,13 +534,14 @@
         const item = product(id);
         return `<div class="cart-line"><span class="mini">${productIcon(item)}</span><span><strong>${item.name}</strong><small>${count} × ${item.pack}</small></span><b>${money(count * item.price)}</b></div>`;
       }).join("") : `<div class="cart-empty">Your basket is waiting for something good.<br>Add a few essentials to get started.</div>`;
-      document.getElementById("limitText").textContent = `${cartWeight()} / 35 kg`;
-      document.getElementById("progressFill").style.width = `${Math.min(100, cartWeight() / 35 * 100)}%`;
+      const usedRationWeight = orderedRationWeight() + cartWeight();
+      document.getElementById("limitText").textContent = `${usedRationWeight} / ${rationLimitKg} kg`;
+      document.getElementById("progressFill").style.width = `${Math.min(100, usedRationWeight / rationLimitKg * 100)}%`;
       document.getElementById("cartTotal").textContent = money(cartTotal());
       document.getElementById("checkoutButton").disabled = !entries.length;
     }
     function changeQuantity(id, change) {
-      if (change > 0 && cartWeight() + product(id).kg > 35) return showToast("Your order can’t exceed the 35 kg ration limit.");
+      if (change > 0 && product(id).kg > remainingRationWeight()) return showToast(`You have ${remainingRationWeight()} kg remaining in the 35 kg session ration limit.`);
       if (change > 0 && (cart[id] || 0) >= product(id).stock) return showToast("That quantity is not available in current stock.");
       cart[id] = Math.max(0, (cart[id] || 0) + change);
       if (!cart[id]) delete cart[id];
@@ -538,9 +556,28 @@
       if (focusable) focusable.focus();
     }
     function closeModal() { document.getElementById("modalBackdrop").classList.remove("open"); }
+    function openProfileMenu() {
+      const activeRole = currentRole === "shopkeeper" ? "Shopkeeper" : "Customer";
+      openModal(`<div class="modal-top"><div><p class="eyebrow">Profile</p><h2 id="modalTitle">Demo account</h2><p>${escapeHTML(activeRole)} view · ${rationCardValid ? "Ration Card Status: Valid" : "Ration card status not checked"}</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
+        <p class="form-hint">Choose a role to preview the matching prototype view. Role selection is for demonstration only and is not authentication.</p>
+        <div style="display:grid;gap:9px;margin:16px 0"><button class="button ${currentRole === "customer" ? "" : "secondary"} full" type="button" data-role="customer">Continue as Customer</button><button class="button ${currentRole === "shopkeeper" ? "" : "secondary"} full" type="button" data-role="shopkeeper">Switch to Shopkeeper</button></div>
+        <button class="button light full" type="button" id="profileCheckCard">Check ration card status</button>`);
+      document.querySelectorAll("[data-role]").forEach(button => button.addEventListener("click", () => switchDemoRole(button.dataset.role)));
+      document.getElementById("profileCheckCard").addEventListener("click", openVerification);
+      bindClose();
+    }
+    function switchDemoRole(role) {
+      if (role !== "customer" && role !== "shopkeeper") return;
+      currentRole = role;
+      document.getElementById("shopkeeperNavButton").hidden = role !== "shopkeeper";
+      closeModal();
+      if (role === "shopkeeper") setScreen("shopkeeper");
+      else if (currentScreen === "shopkeeper") setScreen("shop");
+      showToast(`Switched to ${role === "shopkeeper" ? "Shopkeeper" : "Customer"} demo view.`);
+    }
     function openVerification() {
-      openModal(`<div class="modal-top"><div><p class="eyebrow">Ration card eligibility</p><h2 id="modalTitle">Check ration card status</h2><p>Use Aadhaar / OTP to check whether the ration card is valid. This checks card status only; it does not verify that you are the cardholder.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
-        <form id="verifyForm"><div class="form-field"><label for="aadhaar">Aadhaar number for status check</label><input id="aadhaar" inputmode="numeric" maxlength="12" placeholder="Enter 12-digit Aadhaar number" required pattern="[0-9]{12}"><span class="form-hint">Prototype only — use any 12 digits and demo OTP 123456. This simulates a valid-card result; it does not contact Aadhaar services or verify cardholder identity.</span></div>
+      openModal(`<div class="modal-top"><div><p class="eyebrow">Ration card eligibility</p><h2 id="modalTitle">Check ration card status</h2><p>Aadhaar / OTP checks card validity only, not who is using the card.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
+        <form id="verifyForm"><div class="form-field"><label for="aadhaar">Aadhaar number for status check</label><input id="aadhaar" inputmode="numeric" maxlength="12" placeholder="Enter 12-digit Aadhaar number" required pattern="[0-9]{12}"><span class="form-hint">Prototype only — use any 12 digits and demo OTP 123456. This simulates a valid-card result and does not contact Aadhaar services.</span></div>
         <div class="form-field"><label for="otp">One-time password</label><input id="otp" inputmode="numeric" maxlength="6" placeholder="Enter demo OTP: 123456" required pattern="[0-9]{6}"></div><button class="button full" type="submit">Verify &amp; continue</button></form>`);
       document.getElementById("verifyForm").addEventListener("submit", event => {
         event.preventDefault();
@@ -549,8 +586,8 @@
           return;
         }
         rationCardValid = true;
-        document.getElementById("profileStatus").textContent = "Ration card status: valid";
-        document.getElementById("verificationLabel").textContent = "Ration card valid";
+        document.getElementById("profileStatus").textContent = "Ration Card Status: Valid";
+        document.getElementById("verificationLabel").textContent = "Ration Card Valid";
         document.getElementById("verificationButton").classList.add("verified-pill");
         closeModal();
         showToast("Ration card status checked: valid. You’re ready to shop.");
@@ -559,8 +596,8 @@
     }
     function completeRationCardCheck() {
       rationCardValid = true;
-      document.getElementById("profileStatus").textContent = "Ration card status: valid";
-      document.getElementById("verificationLabel").textContent = "Ration card valid";
+      document.getElementById("profileStatus").textContent = "Ration Card Status: Valid";
+      document.getElementById("verificationLabel").textContent = "Ration Card Valid";
       document.getElementById("verificationButton").classList.add("verified-pill");
       const splash = document.getElementById("loginSplash");
       splash.hidden = true;
@@ -569,32 +606,68 @@
       document.body.style.overflow = "";
       showToast("Ration card status checked: valid. You’re ready to shop.");
     }
-    function openCheckout() {
+    function openCheckout(deliveryAddress = "") {
       if (!rationCardValid) return openVerification();
       if (!itemCount()) return;
+      if (cartWeight() > rationLimitKg - orderedRationWeight()) {
+        showToast("This order would exceed the remaining 35 kg session ration limit.");
+        return;
+      }
       openModal(`<div class="modal-top"><div><p class="eyebrow">Almost there</p><h2 id="modalTitle">Complete your order</h2><p>${cartWeight()} kg of essentials · ${money(cartTotal())}</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
         <form id="checkoutForm"><div class="form-field"><label for="deliveryAddress">Delivery address</label><input id="deliveryAddress" required placeholder="House, street, area and PIN code"></div><p style="font-size:10px;font-weight:750;margin:17px 0 8px">Choose a payment method</p>
         <label class="payment-option"><input type="radio" name="payment" value="PayTM" checked><span><strong>PayTM</strong><small>Secure online payment</small></span><span style="margin-left:auto;color:var(--green);font-weight:800">PayTM</span></label>
         <label class="payment-option"><input type="radio" name="payment" value="Cash on delivery"><span><strong>Cash on delivery</strong><small>Pay the shopkeeper when your order arrives</small></span><span style="margin-left:auto">💵</span></label>
-        <div class="order-confirm"><strong>Order total</strong><span style="float:right"><strong>${money(cartTotal())}</strong></span><br>${cartWeight()} kg · ${itemCount()} packs</div><button class="button full" type="submit">Place order · ${money(cartTotal())}</button></form>`);
-      document.getElementById("checkoutForm").addEventListener("submit", event => {
+        <div class="order-confirm"><strong>Order total</strong><span style="float:right"><strong>${money(cartTotal())}</strong></span><br>${cartWeight()} kg · ${itemCount()} packs</div><button class="button full" id="checkoutSubmit" type="submit">Continue to PayTM · ${money(cartTotal())}</button></form>`);
+      document.getElementById("deliveryAddress").value = deliveryAddress;
+      const checkoutForm = document.getElementById("checkoutForm");
+      const submitButton = document.getElementById("checkoutSubmit");
+      checkoutForm.querySelectorAll('input[name="payment"]').forEach(input => input.addEventListener("change", () => {
+        submitButton.textContent = input.value === "PayTM" ? `Continue to PayTM · ${money(cartTotal())}` : `Place order · ${money(cartTotal())}`;
+      }));
+      checkoutForm.addEventListener("submit", event => {
         event.preventDefault();
         const payment = new FormData(event.currentTarget).get("payment");
-        const shop = selectedShop();
-        const items = Object.entries(cart).map(([id, count]) => {
-          const item = product(id);
-          return { id, count, name: item.name, emoji: item.emoji, pack: item.pack, kg: item.kg, price: item.price };
-        });
-        const order = { id: `ER-${nextOrder++}`, shopId: shop.id, shopName: shop.name, date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }), items, amount: cartTotal(), weight: cartWeight(), payment, status: "Processing" };
-        orders.unshift(order);
-        items.forEach(({ id, count }) => { shop.stocks[id] -= count; });
-        Object.keys(cart).forEach(id => delete cart[id]);
-        closeModal();
-        renderProducts();
-        renderCart();
-        showToast(`Order ${order.id} placed successfully.`);
+        const deliveryAddress = document.getElementById("deliveryAddress").value.trim();
+        if (payment === "PayTM") openPaytmPayment(deliveryAddress);
+        else placeOrder(payment, deliveryAddress);
       });
       bindClose();
+    }
+    function openPaytmPayment(deliveryAddress) {
+      openModal(`<div class="modal-top"><div><p class="eyebrow">Secure payment</p><h2 id="modalTitle">Pay with PayTM</h2><p>Review the sample payment below to finish your order.</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
+        <section class="paytm-window" aria-label="PayTM sample payment window"><div class="paytm-window-header"><span class="paytm-wordmark">PayTM</span><span class="demo-tag">DEMO PAYMENT</span></div>
+          <div class="paytm-window-body"><p>Scan this sample code with your PayTM app</p><strong class="paytm-amount">${money(cartTotal())}</strong>
+            <svg class="demo-qr" viewBox="0 0 100 100" role="img" aria-label="Decorative sample QR code, not payable">
+              <rect width="100" height="100" fill="#fff"/>
+              <path fill="#17261e" d="M4 4h30v30H4zm5 5v20h20V9zm5 5h10v10H14zM66 4h30v30H66zm5 5v20h20V9zm5 5h10v10H76zM4 66h30v30H4zm5 5v20h20V71zm5 5h10v10H14zM40 4h8v8h-8zm10 0h8v8h-8zm-10 12h8v8h-8zm8 8h8v8h-8zm-8 8h8v8h-8zm12 4h8v8h-8zm8-8h8v8h-8zm8 8h8v8h-8zm12 0h8v8h-8zm8 8h8v8h-8zM40 44h8v8h-8zm12 0h8v8h-8zm16 0h8v8h-8zm12 0h8v8h-8zm-36 12h8v8h-8zm12 0h8v8h-8zm12 0h8v8h-8zm12 0h8v8h-8zm12 0h8v8h-8zM40 68h8v8h-8zm12 0h8v8h-8zm16 0h8v8h-8zm8 8h8v8h-8zm-32 8h8v8h-8zm12 0h8v8h-8zm16 4h8v8h-8zm16-8h8v8h-8z"/>
+            </svg>
+            <p>Demo merchant · E-Ration Shop</p><p class="paytm-demo-warning">This is a prototype. No money will be charged and this QR code cannot be used to pay.</p>
+          </div></section>
+        <button class="button full" type="button" id="simulatePaytm">Simulate successful payment · ${money(cartTotal())}</button><button class="button secondary full" type="button" id="backToCheckout" style="margin-top:9px">Back to checkout</button>`);
+      document.getElementById("simulatePaytm").addEventListener("click", () => placeOrder("PayTM", deliveryAddress));
+      document.getElementById("backToCheckout").addEventListener("click", () => openCheckout(deliveryAddress));
+      bindClose();
+    }
+    function placeOrder(payment, deliveryAddress) {
+      if (!itemCount() || cartWeight() > rationLimitKg - orderedRationWeight()) {
+        closeModal();
+        showToast("This order would exceed the remaining 35 kg session ration limit.");
+        return;
+      }
+      const shop = selectedShop();
+      const items = Object.entries(cart).map(([id, count]) => {
+        const item = product(id);
+        return { id, count, name: item.name, emoji: item.emoji, pack: item.pack, kg: item.kg, price: item.price };
+      });
+      const order = { id: `ER-${nextOrder++}`, shopId: shop.id, shopName: shop.name, date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }), deliveryAddress, items, amount: cartTotal(), weight: cartWeight(), payment, status: "Processing" };
+      orders.unshift(order);
+      items.forEach(({ id, count }) => { shop.stocks[id] -= count; });
+      Object.keys(cart).forEach(id => delete cart[id]);
+      closeModal();
+      renderProducts();
+      renderCart();
+      if (currentScreen === "orders") renderCustomerOrders();
+      showToast(payment === "PayTM" ? `Demo PayTM payment successful. Order ${order.id} placed.` : `Order ${order.id} placed successfully.`);
     }
     function renderCustomerOrders() {
       const tbody = document.getElementById("customerOrders");
@@ -606,7 +679,7 @@
       const shopComplaints = complaints.filter(complaint => complaint.shopId === shop.id);
       document.getElementById("managedShopName").textContent = shop.name;
       document.getElementById("inventoryList").innerHTML = shopProducts().map(item => `<div class="inventory-item"><span class="mini">${productIcon(item)}</span><span><strong>${item.name}</strong><small>${money(item.price)} per ${item.pack}</small></span><label><span class="form-hint">Stock (packs)</span><input class="stock-input" type="number" min="0" data-stock="${item.id}" value="${item.stock}" aria-label="${item.name} stock in packs"></label></div>`).join("");
-      const ordersRows = shopOrders.length ? shopOrders.map(order => `<tr><td><strong>${order.id}</strong><br><span class="form-hint">Mauricio G. · ${order.weight} kg</span></td><td>${order.payment}</td><td><span class="status ${order.status === "Rejected" ? "rejected" : order.status === "Processing" ? "pending" : ""}">${order.status}</span></td><td>${order.status === "Processing" ? `<button class="table-action" data-reject="${order.id}">Reject</button>` : ""}</td></tr>`).join("") : `<tr><td colspan="4" class="empty-orders">New customer orders for ${escapeHTML(shop.name)} will appear here.</td></tr>`;
+      const ordersRows = shopOrders.length ? shopOrders.map(order => `<tr><td><strong>${order.id}</strong><br><span class="form-hint">Customer · ${order.weight} kg</span></td><td>${order.payment}</td><td><span class="status ${order.status === "Rejected" ? "rejected" : order.status === "Processing" ? "pending" : ""}">${order.status}</span></td><td>${order.status === "Processing" ? `<button class="table-action" data-reject="${order.id}">Reject</button>` : ""}</td></tr>`).join("") : `<tr><td colspan="4" class="empty-orders">New customer orders for ${escapeHTML(shop.name)} will appear here.</td></tr>`;
       document.getElementById("shopkeeperOrders").innerHTML = ordersRows;
       document.getElementById("transactions").innerHTML = shopOrders.length ? shopOrders.map(order => `<tr><td><strong>${order.id}</strong></td><td>${order.date}</td><td>${order.payment}</td><td><strong>${money(order.amount)}</strong></td><td><span class="status ${order.status === "Rejected" ? "rejected" : ""}">${order.status === "Rejected" ? "Refund / review" : order.payment === "PayTM" ? "Paid online" : "Due on delivery"}</span></td></tr>`).join("") : `<tr><td colspan="5" class="empty-orders">Transactions for this shop will appear here as orders are placed.</td></tr>`;
       document.getElementById("ordersBadge").textContent = `${shopOrders.length} ${shopOrders.length === 1 ? "order" : "orders"}`;
@@ -615,9 +688,10 @@
       document.getElementById("metricTransactions").textContent = shopOrders.length;
       document.getElementById("metricOnline").textContent = money(online);
       document.getElementById("metricCash").textContent = money(cash);
-      document.getElementById("complaintsBadge").textContent = `${shopComplaints.length} open`;
-      document.getElementById("complaintsList").innerHTML = shopComplaints.length ? shopComplaints.map(complaint => `<tr><td><strong>${escapeHTML(complaint.id)}</strong></td><td>${escapeHTML(complaint.order)}</td><td>${escapeHTML(complaint.details)}</td><td><span class="status pending">Needs review</span></td></tr>`).join("") : `<tr><td colspan="4" class="empty-orders">Customer complaints for this shop will appear here.</td></tr>`;
+      document.getElementById("complaintsBadge").textContent = `${shopComplaints.filter(complaint => complaint.status !== "Resolved").length} open`;
+      document.getElementById("complaintsList").innerHTML = shopComplaints.length ? shopComplaints.map(complaint => `<tr><td><strong>${escapeHTML(complaint.id)}</strong></td><td>${escapeHTML(complaint.order)}</td><td>${escapeHTML(complaint.details)}${complaint.response ? `<br><span class="form-hint">Response: ${escapeHTML(complaint.response)}</span>` : ""}</td><td><span class="status ${complaint.status === "Resolved" ? "" : "pending"}">${escapeHTML(complaint.status)}</span></td><td><button class="table-action" data-review-complaint="${escapeHTML(complaint.id)}">${complaint.status === "Resolved" ? "View / edit" : "Review"}</button></td></tr>`).join("") : `<tr><td colspan="5" class="empty-orders">Customer complaints for this shop will appear here.</td></tr>`;
       document.querySelectorAll("[data-reject]").forEach(button => button.addEventListener("click", () => rejectOrder(button.dataset.reject)));
+      document.querySelectorAll("[data-review-complaint]").forEach(button => button.addEventListener("click", () => reviewComplaint(button.dataset.reviewComplaint)));
       document.getElementById("saveStockButton").onclick = () => {
         document.querySelectorAll("[data-stock]").forEach(input => {
           const quantity = Number(input.value);
@@ -636,7 +710,27 @@
       renderProducts();
       renderShopkeeper();
       renderCustomerOrders();
+      renderCart();
       showToast(`Order ${id} rejected. Customer email notification queued (prototype).`);
+    }
+    function reviewComplaint(id) {
+      const complaint = complaints.find(item => item.id === id && item.shopId === selectedShopId);
+      if (!complaint) return;
+      openModal(`<div class="modal-top"><div><p class="eyebrow">Customer support · ${escapeHTML(complaint.id)}</p><h2 id="modalTitle">Review complaint</h2><p>Order ${escapeHTML(complaint.order)} · Submitted ${escapeHTML(complaint.date)}</p></div><button class="close-btn" data-close aria-label="Close">×</button></div>
+        <div class="order-confirm">${escapeHTML(complaint.details)}</div>
+        <form id="complaintReviewForm"><div class="form-field"><label for="complaintReviewStatus">Status</label><select id="complaintReviewStatus"><option value="Needs review">Needs review</option><option value="In review">In review</option><option value="Resolved">Resolved</option></select></div><div class="form-field"><label for="complaintResponse">Response to customer</label><textarea id="complaintResponse" maxlength="500" placeholder="Add an update or explain how the issue was resolved"></textarea><span class="form-hint">The customer can see this response in their complaint tracking view.</span></div><button class="button full" type="submit">Save review</button></form>`);
+      document.getElementById("complaintReviewStatus").value = complaint.status;
+      document.getElementById("complaintResponse").value = complaint.response || "";
+      document.getElementById("complaintReviewForm").addEventListener("submit", event => {
+        event.preventDefault();
+        complaint.status = document.getElementById("complaintReviewStatus").value;
+        complaint.response = document.getElementById("complaintResponse").value.trim();
+        closeModal();
+        renderShopkeeper();
+        renderCustomerComplaints();
+        showToast(`${complaint.id} review saved.`);
+      });
+      bindClose();
     }
     function submitComplaint() {
       const orderChoices = orders.map(order => `<option value="${escapeHTML(order.id)}">${escapeHTML(order.id)} · ${escapeHTML(order.shopName)}</option>`).join("");
@@ -658,7 +752,7 @@
       document.getElementById("complaintCountBadge").textContent = `${complaints.length} submitted`;
       document.getElementById("customerComplaints").innerHTML = complaints.length ? complaints.map(complaint => {
         const shop = shopById(complaint.shopId);
-        return `<article class="complaint-card"><span><strong>${escapeHTML(complaint.id)} · Order ${escapeHTML(complaint.order)}</strong><small>${escapeHTML(complaint.date)} · ${escapeHTML(shop ? shop.name : "Ration shop")}</small></span><small class="complaint-details">${escapeHTML(complaint.details)}</small><span class="status pending">${escapeHTML(complaint.status)}</span></article>`;
+        return `<article class="complaint-card"><span><strong>${escapeHTML(complaint.id)} · Order ${escapeHTML(complaint.order)}</strong><small>${escapeHTML(complaint.date)} · ${escapeHTML(shop ? shop.name : "Ration shop")}</small></span><small class="complaint-details">${escapeHTML(complaint.details)}${complaint.response ? `<br><br><strong>Shopkeeper response</strong><br>${escapeHTML(complaint.response)}` : ""}</small><span class="status ${complaint.status === "Resolved" ? "" : "pending"}">${escapeHTML(complaint.status)}</span></article>`;
       }).join("") : `<div class="empty-orders">You haven’t submitted any complaints yet.</div>`;
     }
     function bindClose() { document.querySelectorAll("[data-close]").forEach(button => button.addEventListener("click", closeModal)); }
@@ -689,7 +783,7 @@
       setScreen("shop");
       document.getElementById("cartPanel").scrollIntoView({ behavior: "smooth", block: "center" });
     });
-    document.getElementById("profileButton").addEventListener("click", openVerification);
+    document.getElementById("profileButton").addEventListener("click", openProfileMenu);
     document.getElementById("verificationButton").addEventListener("click", openVerification);
     document.getElementById("checkoutButton").addEventListener("click", openCheckout);
     document.getElementById("searchInput").addEventListener("input", renderProducts);
