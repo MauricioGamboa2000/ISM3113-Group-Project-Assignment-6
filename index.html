@@ -791,7 +791,7 @@
     });
     document.getElementById("profileButton").addEventListener("click", openProfileMenu);
     document.getElementById("verificationButton").addEventListener("click", openVerification);
-    document.getElementById("checkoutButton").addEventListener("click", openCheckout);
+    document.getElementById("checkoutButton").addEventListener("click", () => openCheckout());
     document.getElementById("searchInput").addEventListener("input", renderProducts);
     document.querySelectorAll(".category").forEach(button => button.addEventListener("click", () => {
       activeCategory = button.dataset.category;
